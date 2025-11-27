@@ -5,6 +5,21 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const messages = body.messages || [];
+    const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
+
+    // MOCK INTERCEPTION FOR DEMO (Doctor Flow)
+    if (lastMessage.includes('doctor') || lastMessage.includes('leave early')) {
+       return NextResponse.json({ 
+           role: 'assistant', 
+           content: 'I checked your schedule. You have a Team Meeting at 2:00 PM. I recommend leaving before that. [SUGGESTION|12:00 PM|Avoids 2 PM Meeting]' 
+       });
+    }
+    if (lastMessage.includes('accept 12 pm')) {
+       return NextResponse.json({ 
+           role: 'assistant', 
+           content: 'Confirmed. I have logged your early departure for 12:00 PM. [COMPLETE]' 
+       });
+    }
 
     // Fallback for API key if env var is missing
     // User can replace 'YOUR_OPENROUTER_KEY_HERE' with their actual key if .env fails

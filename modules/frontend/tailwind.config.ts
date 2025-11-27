@@ -8,10 +8,11 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', 'sans-serif'],
+        sans: ['var(--font-inter)', 'sans-serif'],
+        display: ['var(--font-jakarta)', 'sans-serif'],
       },
       colors: {
-        primary: '#6A53E7',
+        primary: '#9747FF',
       },
     },
   },

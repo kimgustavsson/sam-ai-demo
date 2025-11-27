@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
-import { StatusBar } from "./components/StatusBar";
+import SplashScreen from "./components/SplashScreen";
 
 export const metadata: Metadata = {
   title: "Chat Assistant",
@@ -15,6 +15,18 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+const jakarta = Plus_Jakarta_Sans({ 
+  subsets: ["latin"], 
+  variable: '--font-jakarta', 
+  weight: ['500', '700', '800'] 
+});
+
+const inter = Inter({ 
+  subsets: ["latin"], 
+  variable: '--font-inter', 
+  weight: ['400', '500'] 
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,10 +35,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${GeistSans.className} antialiased bg-white text-slate-900 pt-12`}
+        className={`${jakarta.variable} ${inter.variable} font-sans antialiased bg-white text-slate-900 pt-12`}
         suppressHydrationWarning={true}
       >
-        <StatusBar />
+        <SplashScreen />
         {children}
       </body>
     </html>

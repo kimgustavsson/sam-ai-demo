@@ -24,8 +24,8 @@ const CallOverlay: React.FC<CallOverlayProps> = ({ onEndCall }) => {
           <User className="w-16 h-16 text-gray-400" />
         </div>
         <div className="flex flex-col items-center space-y-2">
-          <h2 className="text-3xl font-bold text-white tracking-wide">Manager</h2>
-          <p className="text-lg text-gray-400 font-medium tracking-wide">
+          <h2 className="font-display text-3xl font-bold text-white tracking-wide">Manager</h2>
+          <p className="font-sans text-lg text-gray-400 font-medium tracking-wide">
             Calling{dots}
           </p>
         </div>
