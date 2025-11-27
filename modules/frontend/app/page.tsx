@@ -273,8 +273,8 @@ export default function MainChatScreen() {
                         "Sick leave",
                         "Report mistake",
                         "Late to work",
-                        "want to report a problem",
-                        "Do you have a doctor's note or medical certificate"
+                        "Have a problem",
+                        "Upload doctor's note or medical certificate"
                       ].map((text) => (
                         <button
                           key={text}
