@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, FileText, Mic, Send, Sparkles, Pill, Clock, Settings as SettingsIcon, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Home, FileText, Mic, Send, Sparkles, Pill, Clock, Settings as SettingsIcon, CheckCircle, ArrowLeft, Upload, X, Image as ImageIcon, Phone } from 'lucide-react';
+import CallOverlay from './components/CallOverlay';
 
 // Define types for SpeechRecognition
 interface IWindow extends Window {
@@ -18,10 +19,16 @@ export default function MainChatScreen() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [viewState, setViewState] = useState<'main' | 'questions' | 'problems'>('main');
   const [ticketState, setTicketState] = useState<'chat' | 'decision' | 'summary' | 'success'>('chat');
+  const [activeFlow, setActiveFlow] = useState<'none' | 'late_to_work' | 'call_manager'>('none');
+  const [isCalling, setIsCalling] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [summaryData, setSummaryData] = useState({ type: 'Sick Leave', details: 'User reported not feeling well and requested sick leave. Symptoms noted. Expecting to be out for 2 days.' });
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Settings State
   const [settings, setSettings] = useState({
@@ -136,11 +143,78 @@ export default function MainChatScreen() {
     if (currentTab === 'home') {
       setMessages([]); // Reset to initial state
       setInput('');
-      setShowSuggestions(false);
+      setViewState('main');
       setTicketState('chat');
+      setActiveFlow('none');
+      setSelectedImage(null);
     } else {
       setCurrentTab('home');
     }
+  };
+
+  const handleLateToWork = () => {
+    setActiveFlow('late_to_work');
+    setViewState('main');
+    const question = "When will you arrive?";
+    setMessages(prev => [...prev, { role: 'assistant', content: question }]);
+  };
+
+  const handleReportProblem = () => {
+    setViewState('problems');
+  };
+  
+  const handleNeedAssistance = () => {
+    setViewState('main');
+    setActiveFlow('call_manager');
+    setMessages(prev => [...prev, 
+      { role: 'user', content: "Need assistance" },
+      { role: 'assistant', content: "I can help. Do you want to call your manager directly?" }
+    ]);
+  };
+
+  const handleCallManager = () => {
+    setIsCalling(true);
+    setActiveFlow('none');
+  };
+
+  const handleEndCall = () => {
+    setIsCalling(false);
+    setMessages(prev => [...prev, { 
+      role: 'system', 
+      content: "📞 Call ended. Duration: 0:42. A follow-up note has been sent to your manager." 
+    }]);
+  };
+
+  const handleUploadNote = () => {
+    // Trigger file input
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSelectedImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadConfirm = () => {
+      if (!selectedImage) return;
+      
+      // Simulate upload
+      setMessages(prev => [...prev, 
+          { role: 'user', content: 'Uploaded a doctor\'s note.' },
+          { role: 'assistant', content: 'File received. Thank you.' }
+      ]);
+      setSelectedImage(null);
+      setViewState('main');
+  };
+
+  const cancelUpload = () => {
+      setSelectedImage(null);
   };
 
   // Sub-components for cleaner rendering
@@ -149,7 +223,7 @@ export default function MainChatScreen() {
       <span className="text-lg font-medium text-gray-800">{label}</span>
       <button 
         onClick={onChange}
-        className={`w-14 h-8 flex items-center rounded-full p-1 transition-colors duration-300 ${value ? 'bg-purple-600' : 'bg-gray-300'}`}
+        className={`w-14 h-8 flex items-center rounded-full p-1 transition-colors duration-300 ${value ? 'bg-primary' : 'bg-gray-300'}`}
       >
         <div className={`bg-white w-6 h-6 rounded-full shadow-sm transform transition-transform duration-300 ${value ? 'translate-x-6' : 'translate-x-0'}`} />
       </button>
@@ -166,8 +240,10 @@ export default function MainChatScreen() {
   return (
     <div className={`min-h-screen bg-[#F2F4F7] flex flex-col font-sans text-gray-900 pb-20 relative ${settings.largerText ? 'text-lg' : ''} ${settings.highContrast ? 'contrast-125' : ''}`}>
       
+      {isCalling && <CallOverlay onEndCall={handleEndCall} />}
+
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center px-4 sm:px-6 overflow-y-auto pt-10 pb-24 w-full max-w-lg mx-auto">
+      <main className="flex-1 flex flex-col items-center px-4 sm:px-6 overflow-y-auto pt-20 pb-24 w-full max-w-lg mx-auto">
         
         {/* HOME TAB */}
         {currentTab === 'home' && (
@@ -179,14 +255,19 @@ export default function MainChatScreen() {
                   
                   <div className="space-y-4">
                     <div>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Name</label>
+                        <div className="text-lg font-medium text-gray-800">Fatima</div>
+                    </div>
+
+                    <div>
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Type</label>
-                      <div className="text-lg font-medium text-gray-800">Sick Leave</div>
+                      <div className="text-lg font-medium text-gray-800">{summaryData.type}</div>
                     </div>
                     
                     <div>
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Details</label>
                       <p className="text-base text-gray-600 mt-1 bg-gray-50 p-3 rounded-xl">
-                        User reported not feeling well and requested sick leave. Symptoms noted. Expecting to be out for 2 days.
+                        {summaryData.details}
                       </p>
                     </div>
                   </div>
@@ -194,9 +275,9 @@ export default function MainChatScreen() {
                   <div className="mt-8">
                     <button 
                       onClick={() => setTicketState('success')}
-                      className="w-full bg-purple-600 text-white text-lg font-semibold py-4 rounded-2xl shadow-lg hover:bg-purple-700 transition-all active:scale-95"
+                      className="w-full bg-primary text-white text-lg font-semibold py-4 rounded-2xl shadow-lg hover:bg-primary/90 transition-all active:scale-95"
                     >
-                      Submit Ticket
+                      Send to Manager
                     </button>
                   </div>
                 </div>
@@ -206,10 +287,7 @@ export default function MainChatScreen() {
                 <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-2">
                   <CheckCircle className="w-12 h-12 text-green-600" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-800 text-center">Ticket Submitted!</h2>
-                <p className="text-gray-500 text-center max-w-xs">
-                  Your report has been successfully sent to HR. You will receive a confirmation email shortly.
-                </p>
+                <h2 className="text-3xl font-bold text-gray-800 text-center">Sent to Manager! Get well soon.</h2>
                 <button 
                   onClick={handleHomeClick}
                   className="mt-8 px-8 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-full hover:bg-gray-50 transition-all"
@@ -228,20 +306,20 @@ export default function MainChatScreen() {
                     <h1 className="text-2xl sm:text-3xl font-semibold text-center leading-tight text-gray-800">
                       Hi, Fatima, how can i help you today?
                     </h1>
-                    <Sparkles className="w-6 h-6 text-purple-500 fill-purple-100" />
+                    <Sparkles className="w-6 h-6 text-primary fill-purple-100" />
                   </div>
                 </div>
 
                 {/* Action Buttons or Suggestions */}
-                {!showSuggestions ? (
+                {viewState === 'main' && (
                   <div className="w-full flex flex-row gap-4">
                     <button 
-                      onClick={() => setShowSuggestions(true)} 
+                      onClick={() => setViewState('questions')} 
                       className="flex-1 flex flex-col items-center justify-center bg-white p-6 rounded-3xl shadow-sm hover:shadow-md transition-all active:scale-95 duration-200 h-40"
                       aria-label="Common questions"
                     >
                       <div className="p-4 bg-purple-50 rounded-full mb-3">
-                        <Pill className="w-8 h-8 text-purple-600" /> 
+                        <Pill className="w-8 h-8 text-primary" /> 
                       </div>
                       <span className="text-lg font-medium text-gray-800">Questions</span>
                     </button>
@@ -252,41 +330,97 @@ export default function MainChatScreen() {
                       aria-label="View instruction files"
                     >
                       <div className="p-4 bg-purple-50 rounded-full mb-3">
-                        <FileText className="w-8 h-8 text-purple-600" />
+                        <FileText className="w-8 h-8 text-primary" />
                       </div>
                       <span className="text-lg font-medium text-gray-800">Instruction Files</span>
                     </button>
                   </div>
-                ) : (
+                )}
+
+                {viewState === 'questions' && (
                   <div className="w-full flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div className="flex items-center justify-between px-2">
                       <h3 className="text-lg font-semibold text-gray-800">Common questions</h3>
                       <button 
-                        onClick={() => setShowSuggestions(false)}
-                        className="text-sm text-purple-600 font-medium hover:text-purple-800"
+                        onClick={() => setViewState('main')}
+                        className="text-sm text-primary font-medium hover:text-primary/80"
                       >
                         Close
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {[
-                        "Sick leave",
-                        "Report mistake",
-                        "Late to work",
-                        "Have a problem",
-                        "Upload doctor's note or medical certificate"
-                      ].map((text) => (
-                        <button
-                          key={text}
-                          onClick={() => {
-                            handleSend(text);
-                            setShowSuggestions(false);
-                          }}
-                          className="px-4 py-2 bg-white border border-purple-100 text-purple-700 rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
-                        >
-                          {text}
-                        </button>
-                      ))}
+                      <button
+                        onClick={() => {
+                          handleSend("Sick leave");
+                          setViewState('main');
+                        }}
+                        className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
+                      >
+                        Sick leave
+                      </button>
+
+                      <button
+                        onClick={handleLateToWork}
+                        className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
+                      >
+                        Late to work
+                      </button>
+
+                      <button
+                        onClick={handleReportProblem}
+                        className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
+                      >
+                        Have a problem
+                      </button>
+
+                      <button
+                        onClick={handleUploadNote}
+                        className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
+                      >
+                        Upload doctor's note
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {viewState === 'problems' && (
+                   <div className="w-full flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="flex items-center justify-between px-2">
+                      <h3 className="text-lg font-semibold text-gray-800">Select a problem</h3>
+                      <button 
+                        onClick={() => setViewState('main')}
+                        className="text-sm text-primary font-medium hover:text-primary/80"
+                      >
+                        Close
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => {
+                          handleSend("Forgot a key/card");
+                          setViewState('main');
+                        }}
+                        className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
+                      >
+                        Forgot a key/card
+                      </button>
+
+                      <button
+                        onClick={handleNeedAssistance}
+                        className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
+                      >
+                        Need assistance
+                      </button>
+
+                      <button
+                        onClick={() => {
+                            handleCallManager();
+                            setViewState('main');
+                        }}
+                        className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
+                      >
+                        Call my manager
+                      </button>
                     </div>
                   </div>
                 )}
@@ -295,11 +429,24 @@ export default function MainChatScreen() {
                 <div className="w-full flex flex-col space-y-4 pb-4 pt-4">
                     {messages.map((msg, index) => (
                         <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[80%] p-4 rounded-2xl ${msg.role === 'user' ? 'bg-purple-600 text-white rounded-br-none' : 'bg-white text-gray-800 shadow-sm rounded-bl-none'}`}>
+                            <div className={`max-w-[80%] p-4 rounded-2xl ${msg.role === 'user' ? 'bg-primary text-white rounded-br-none' : 'bg-white text-gray-800 shadow-sm rounded-bl-none'}`}>
                                 {msg.content}
                             </div>
                         </div>
                     ))}
+
+                    {messages.length > 0 && messages[messages.length - 1].role === 'system' && messages[messages.length - 1].content.includes("Call ended") && (
+                       <div className="w-full mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                          <button 
+                            onClick={handleHomeClick}
+                            className="w-full bg-[#6A53E7] text-white text-lg font-semibold py-4 rounded-2xl shadow-lg hover:bg-[#5a43d6] transition-all active:scale-95 flex items-center justify-center space-x-2"
+                          >
+                            <Home className="w-5 h-5" />
+                            <span>Back to Home</span>
+                          </button>
+                       </div>
+                    )}
+
                     {isLoading && (
                          <div className="flex justify-start">
                             <div className="p-4 bg-white rounded-2xl rounded-bl-none text-gray-500 animate-pulse shadow-sm">
@@ -369,20 +516,87 @@ export default function MainChatScreen() {
 
       </main>
 
+      {/* Hidden File Input */}
+      <input 
+        type="file" 
+        ref={fileInputRef}
+        className="hidden" 
+        accept="image/*"
+        onChange={handleFileSelect}
+      />
+
       {/* Bottom Input Bar - Only visible on Home */}
       {currentTab === 'home' && ticketState !== 'summary' && ticketState !== 'success' && (
         <div className="fixed bottom-[80px] left-0 right-0 p-4 w-full max-w-lg mx-auto z-20 pointer-events-none">
+          
+          {/* Specific Flow Chips */}
+          <div className="pointer-events-auto flex flex-wrap justify-center gap-2 mb-4 animate-in slide-in-from-bottom-4 duration-300">
+            {activeFlow === 'late_to_work' && (
+               <>
+                 {["10 mins", "30 mins", "1 hour"].map((time) => (
+                    <button
+                       key={time}
+                       onClick={() => {
+                           // Just set local state for speed, no AI roundtrip needed for this strict flow
+                           setMessages(prev => [...prev, 
+                              { role: 'user', content: time },
+                              { role: 'assistant', content: "Understood. I have notified your manager." }
+                           ]);
+                           setSummaryData({ type: 'Late to Work', details: `User is running late. Estimated arrival in ${time}.` });
+                           setTicketState('summary');
+                       }}
+                       className="px-4 py-2 bg-purple-100 text-primary rounded-full font-semibold shadow-sm border border-purple-200 hover:bg-purple-200 active:scale-95 transition-all"
+                    >
+                       {time}
+                    </button>
+                 ))}
+               </>
+            )}
+
+             {activeFlow === 'call_manager' && (
+                <button
+                    onClick={handleCallManager}
+                    className="flex items-center space-x-2 px-6 py-3 bg-green-500 text-white rounded-full font-bold shadow-lg hover:bg-green-600 active:scale-95 transition-all"
+                >
+                    <Phone className="w-5 h-5 fill-current" />
+                    <span>Call Manager</span>
+                </button>
+            )}
+          </div>
+
+          {/* Image Preview Modal / Card */}
+          {selectedImage && (
+             <div className="pointer-events-auto w-full bg-white rounded-2xl shadow-xl border border-gray-200 p-4 mb-4 animate-in zoom-in duration-300 flex flex-col items-center">
+                <div className="relative w-full h-48 bg-gray-100 rounded-xl overflow-hidden mb-4">
+                    <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
+                    <button 
+                       onClick={cancelUpload}
+                       className="absolute top-2 right-2 p-1 bg-black/50 text-white rounded-full hover:bg-black/70"
+                    >
+                       <X className="w-4 h-4" />
+                    </button>
+                </div>
+                <button 
+                   onClick={handleUploadConfirm}
+                   className="w-full bg-primary text-white font-semibold py-3 rounded-xl shadow-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center space-x-2"
+                >
+                   <Upload className="w-5 h-5" />
+                   <span>Upload Doctor's Note</span>
+                </button>
+             </div>
+          )}
+
           {ticketState === 'decision' ? (
             <div className="pointer-events-auto w-full flex flex-col space-y-3 animate-in slide-in-from-bottom-10 duration-300">
                <button 
                   onClick={() => setTicketState('summary')}
-                  className="w-full bg-purple-600 text-white text-lg font-semibold py-3 rounded-2xl shadow-lg hover:bg-purple-700 active:scale-95 transition-all"
+                  className="w-full bg-primary text-white text-lg font-semibold py-3 rounded-2xl shadow-lg hover:bg-primary/90 active:scale-95 transition-all"
                >
-                 End Conversation & Review
+                 I am done
                </button>
                <button 
                   onClick={() => setTicketState('chat')}
-                  className="w-full bg-white text-purple-600 text-lg font-semibold py-3 rounded-2xl border-2 border-purple-100 hover:bg-purple-50 active:scale-95 transition-all"
+                  className="w-full bg-white text-primary text-lg font-semibold py-3 rounded-2xl border-2 border-purple-100 hover:bg-purple-50 active:scale-95 transition-all"
                >
                  Ask More Questions
                </button>
@@ -401,6 +615,15 @@ export default function MainChatScreen() {
               />
               
               <div className="flex items-center space-x-2">
+                {/* File Upload Trigger (Icon in Input Bar) */}
+                 <button 
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label="Upload file"
+                  onClick={handleUploadNote}
+                >
+                  <ImageIcon className="w-5 h-5" />
+                </button>
+
                 <button 
                   className={`p-2 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-gray-400 hover:text-gray-600'}`}
                   aria-label={isListening ? "Stop listening" : "Start voice input"}
@@ -410,7 +633,7 @@ export default function MainChatScreen() {
                 </button>
                 
                 <button 
-                  className="p-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors shadow-md active:bg-purple-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-3 bg-primary hover:bg-primary/90 text-white rounded-full transition-colors shadow-md active:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Send message"
                   onClick={() => handleSend()}
                   disabled={isLoading || !input.trim()}
@@ -428,7 +651,7 @@ export default function MainChatScreen() {
       <nav className="fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around items-center py-3 pt-4 pb-6 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] z-30">
         <button 
           onClick={handleHomeClick}
-          className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'home' ? 'text-purple-600' : 'text-gray-400 hover:text-gray-600'}`}
+          className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'home' ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`}
           aria-label="Home"
         >
           <Home className="w-7 h-7" />
@@ -437,7 +660,7 @@ export default function MainChatScreen() {
         
         <button 
           onClick={() => setCurrentTab('history')}
-          className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'history' ? 'text-purple-600' : 'text-gray-400 hover:text-gray-600'}`}
+          className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'history' ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`}
           aria-label="History"
         >
           <Clock className="w-7 h-7" />
@@ -446,7 +669,7 @@ export default function MainChatScreen() {
         
         <button 
           onClick={() => setCurrentTab('settings')}
-          className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'settings' ? 'text-purple-600' : 'text-gray-400 hover:text-gray-600'}`}
+          className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'settings' ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`}
           aria-label="Settings"
         >
           <SettingsIcon className="w-7 h-7" />

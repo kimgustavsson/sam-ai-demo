@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { StatusBar } from "./components/StatusBar";
 
 export const metadata: Metadata = {
   title: "Chat Assistant",
@@ -15,9 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="antialiased bg-white text-slate-900"
+        className="antialiased bg-white text-slate-900 pt-12"
         suppressHydrationWarning={true}
       >
+        <StatusBar />
         {children}
       </body>
     </html>

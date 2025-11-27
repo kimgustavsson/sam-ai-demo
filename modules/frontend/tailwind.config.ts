@@ -10,6 +10,9 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-sans)', 'sans-serif'],
       },
+      colors: {
+        primary: '#6A53E7',
+      },
     },
   },
   plugins: [],
