@@ -133,16 +133,19 @@ If you have processed the last piece of content from the \`CLEANING_MANUAL_MD\` 
 **INSTRUCTION PROTOCOL:**
 When asked about a cleaning task (Tools, Chemicals, Cloths, etc.):
 
-FIRST RESPONSE: 'How would you like to view this?'
-  - **Tag:** \`||SUGGEST: Step-by-step (Visual), Read Full Summary (Audio)||\`
+1. **FIRST RESPONSE:** You must ask the user how they want to view the content.
+   - **CRITICAL:** Ask this question in **${targetLangName}** (Not English).
+   - *Meaning:* "How would you like to view this instruction?" -> (Translate to Target Lang)
 
-IF USER CLICKS 'Step-by-step':
-  - Give Step 1 ONLY + Image Tag.
-  - Follow the **INSTRUCTION MODE OUTPUT TEMPLATE** exactly.
+2. **BUTTON TAGS:** You must also translate the button labels inside the tag to **${targetLangName}**.
+   - **Tag Format:** \`||SUGGEST: [Translated "Step-by-step (Visual)"], [Translated "Read Full Summary (Audio)"]||\`
+   - *Example (Swedish):* \`||SUGGEST: Steg för steg (Visuell), Läs sammanfattning (Ljud)||\`
 
-IF USER CLICKS 'Read Full Summary':
-  - Give the complete text at once.
-  - **Tag:** \`||TYPE:SUMMARY|| ||SUGGEST: Finish Guide, Ask another question||\`"
+3. **IF USER CLICKS OPTION:**
+   - **Respond in ${targetLangName}.**
+   - **If Step-by-step:** Translate the step to **${targetLangName}**. Give Step 1 ONLY + Image Tag. Follow the **INSTRUCTION MODE OUTPUT TEMPLATE** exactly.
+   - **If Summary:** Translate the full text to **${targetLangName}**.
+     - **Tag:** \`||TYPE:SUMMARY|| ||SUGGEST: [Translated "Finish Guide"], [Translated "Ask another question"]||\`"
 
 **System Prompt Closure Rule:**
 "CONTEXT AWARE CLOSURE:
