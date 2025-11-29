@@ -320,7 +320,7 @@ export default function MainChatScreen() {
     | "cleaning_tools_selection"
   >("none");
   const [successType, setSuccessType] = useState<
-    "manager" | "security" | "late"
+    "manager" | "security" | "late" | "guide"
   >("manager");
   const [isCalling, setIsCalling] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -534,18 +534,14 @@ export default function MainChatScreen() {
 
     // Validations for New Instruction Buttons
     if (textToSend.includes("Finish Guide")) {
-      // Action 1: Clear History & Reset
-      setMessages([]);
-      setViewState("main");
-      setActiveFlow("none");
-      setTicketState("chat");
-      setCurrentSuggestions([]);
-      
-      // Action 2: Add History Item (Silent)
+      // Action 1: Add History Item (Silent)
       addHistoryItem("INFO");
 
-      // Action 3: Toast
-      alert("Guide Completed."); // Using alert as simple toast for now per requirements
+      // Action 2: Show Success Screen
+      setSuccessType("guide"); 
+      setTicketState("success");
+      
+      setCurrentSuggestions([]);
       return;
     }
 
@@ -554,6 +550,25 @@ export default function MainChatScreen() {
        // Optional: Add a bot message acknowledging
        setMessages(prev => [...prev, { role: 'assistant', content: "Sure, what would you like to know?"}]);
        return; 
+    }
+
+    // MANUAL FIX: Intercept "Yes it looks good" to enforce closure options
+    if (textToSend.toLowerCase() === "yes it looks good") {
+      // 1. Add user message
+      setMessages((prev) => [...prev, { role: "user", content: textToSend }]);
+      setInput("");
+      
+      // 2. Simulate AI Response
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: "Great! You are all done with this guide." },
+        ]);
+        // 3. Force Closure Buttons
+        setCurrentSuggestions(['Finish Guide', 'Ask another question']);
+      }, 500);
+      
+      return; // Stop fetch
     }
 
     // Special handling for "Ask More Questions" or "I have more questions"
@@ -966,6 +981,18 @@ export default function MainChatScreen() {
               <h2 className="font-display text-3xl font-bold text-gray-800 text-center">
                 {t.success_late}
               </h2>
+            </>
+          ) : successType === "guide" ? (
+            <>
+              <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mb-2">
+                <CheckCircle className="w-12 h-12 text-purple-600" />
+              </div>
+              <h2 className="font-display text-3xl font-bold text-gray-800 text-center">
+                Guide Completed!
+              </h2>
+              <p className="text-lg text-gray-600 text-center">
+                Great job. Everything looks clean.
+              </p>
             </>
           ) : (
             <>
