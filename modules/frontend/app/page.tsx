@@ -342,7 +342,9 @@ export default function MainChatScreen() {
     "meeting": "https://images.pexels.com/photos/18033206/pexels-photo-18033206.jpeg",
     // Mappings for backend tags which might differ slightly
     "cloths_wear": "https://images.pexels.com/photos/7876767/pexels-photo-7876767.jpeg", 
-    "meeting_room": "https://images.pexels.com/photos/18033206/pexels-photo-18033206.jpeg"
+    "meeting_room": "https://images.pexels.com/photos/18033206/pexels-photo-18033206.jpeg",
+    // Quality Check
+    "finished_state": "https://images.pexels.com/photos/48889/cleaning-washing-cleanup-the-cleaner-48889.jpeg"
   };
 
   // Instruction State
