@@ -41,6 +41,7 @@ import CallOverlay from "./components/CallOverlay";
 import { StatusBar } from "./components/StatusBar";
 import { InstructionCard } from "./components/InstructionCard";
 import { BottomNav } from "./components/BottomNav";
+import { TTSPlayer } from "./components/TTSPlayer";
 
 // Define types for SpeechRecognition
 interface IWindow extends Window {
@@ -2037,15 +2038,7 @@ export default function MainChatScreen() {
             {/* Scrollable Content */}
             <div className="overflow-y-auto p-6 space-y-6">
                {/* Read Aloud Button */}
-               <button
-                onClick={() => speak(summaryCardContent)}
-                className="w-full flex items-center justify-center space-x-3 bg-purple-50 border border-purple-100 rounded-xl p-4 hover:bg-purple-100 transition-colors group"
-              >
-                <div className="bg-white p-2 rounded-full shadow-sm group-active:scale-95 transition-transform">
-                  <Volume2 className="w-6 h-6 text-[#9747FF]" />
-                </div>
-                <span className="text-lg font-bold text-[#9747FF]">Read Aloud</span>
-              </button>
+               <TTSPlayer text={summaryCardContent || ""} language={language} />
 
               <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
                 <ReactMarkdown>{summaryCardContent}</ReactMarkdown>
