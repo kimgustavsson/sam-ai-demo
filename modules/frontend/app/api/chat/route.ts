@@ -15,21 +15,45 @@ export async function POST(req: Request) {
         ask_mode: "How would you like to view this instruction?",
         btn_step: "Step-by-step (Visual)",
         btn_summary: "Read Full Summary (Audio)",
-        trans_rule: "Respond in English."
+        trans_rule: "Respond in English.",
+        btn_done: "I am done (Send now)",
+        btn_more: "I have more questions",
+        sick_ack: "Oh no, please rest. Should I tell the manager you are taking **TODAY** off?",
+        sick_opts: "Yes please, No - Tomorrow",
+        sick_finish: "Okay. I sent the report. Rest well. Are you done?",
+        late_ack: "Drive safely. When will you arrive?",
+        late_opts: "10 mins, 30 mins, 1 hour",
+        late_finish: "Got it. I told the manager **30 mins**. Are you done?"
       },
       Swedish: {
         role: "Du är Enable, en AI-jobbcoach.",
         ask_mode: "Hur vill du se denna instruktion?",
         btn_step: "Steg för steg (Visuell)",
         btn_summary: "Läs sammanfattning (Ljud)",
-        trans_rule: "VIKTIGT: Svara ENDAST på SVENSKA. Översätt allt innehåll."
+        trans_rule: "VIKTIGT: Svara ENDAST på SVENSKA. Översätt allt innehåll.",
+        btn_done: "Jag är klar (Skicka nu)",
+        btn_more: "Jag har fler frågor",
+        sick_ack: "Åh nej, vila upp dig. Ska jag meddela chefen att du är ledig **IDAG**?",
+        sick_opts: "Ja tack, Nej - Imorgon",
+        sick_finish: "Okej. Jag skickade rapporten. Krya på dig. Är du klar?",
+        late_ack: "Kör försiktigt. När är du framme?",
+        late_opts: "10 min, 30 min, 1 timme",
+        late_finish: "Uppfattat. Jag sa till chefen **30 min**. Är du klar?"
       },
       Arabic: {
         role: "أنت Enable، مدرب عمل ذكي.",
         ask_mode: "كيف تود عرض هذه التعليمات؟",
         btn_step: "خطوة بخطوة (مرئي)",
         btn_summary: "قراءة الملخص (صوتي)",
-        trans_rule: "مهم: أجب باللغة العربية فقط. ترجم كل المحتوى."
+        trans_rule: "مهم: أجب باللغة العربية فقط. ترجم كل المحتوى.",
+        btn_done: "أنا انتهيت (إرسال الآن)",
+        btn_more: "لدي المزيد من الأسئلة",
+        sick_ack: "أوه لا، يرجى الراحة. هل يجب أن أخبر المدير أنك ستأخذ إجازة **اليوم**؟",
+        sick_opts: "نعم من فضلك، لا - غداً",
+        sick_finish: "حسناً. لقد أرسلت التقرير. أتمنى لك الشفاء العاجل. هل انتهيت؟",
+        late_ack: "قد بحذر. متى ستصل؟",
+        late_opts: "10 دقائق، 30 دقيقة، 1 ساعة",
+        late_finish: "فهمت. أخبرت المدير **30 دقيقة**. هل انتهيت؟"
       }
     };
 
@@ -73,7 +97,7 @@ ${P.trans_rule}
 ${dynamicContent}
 
 **CONTEXT-AWARE BUTTONS:**
-- **If Sick/Late:** Use \`||SUGGEST: I am done (Send now), I have more questions||\` (Translate these options to target language).
+- **If Sick/Late:** Use \`||SUGGEST: ${P.btn_done}, ${P.btn_more}||\`
 - **If INSTRUCTION (Teaching):** DO NOT use 'Send now'.
   - Use: **\`||SUGGEST: ${P.btn_step}, ${P.btn_summary}||\`**
   - This signals the user that the lesson is over, not that they are reporting something.
@@ -93,17 +117,15 @@ Whenever you ask a question, you **MUST** provide clickable options using this t
 
 **REQUIRED FLOW (Sick Leave):**
 1. User: "I feel sick."
-2. AI: "Oh no, please rest. Should I tell the manager you are taking **TODAY** off? ||SUGGEST: Yes please, No - Tomorrow||"
+2. AI: "${P.sick_ack} ||SUGGEST: ${P.sick_opts}||"
 3. User: "Yes please."
-4. AI: "Okay. I sent the report. Rest well. Are you done? ||SUGGEST: I am done (Send now), I have more questions||"
-(Ensure all responses and suggestions are in the target language).
+4. AI: "${P.sick_finish} ||SUGGEST: ${P.btn_done}, ${P.btn_more}||"
 
 **REQUIRED FLOW (Late):**
 1. User: "I am late."
-2. AI: "Drive safely. When will you arrive? ||SUGGEST: 10 mins, 30 mins, 1 hour||"
+2. AI: "${P.late_ack} ||SUGGEST: ${P.late_opts}||"
 3. User: "30 mins."
-4. AI: "Got it. I told the manager **30 mins**. Are you done? ||SUGGEST: I am done (Send now), I have more questions||"
-(Ensure all responses and suggestions are in the target language).
+4. AI: "${P.late_finish} ||SUGGEST: ${P.btn_done}, ${P.btn_more}||"
 
 **INSTRUCTION MODE OUTPUT TEMPLATE:**
 You must output the content of each step following this exact structure, with no extra greetings or paragraphs:
