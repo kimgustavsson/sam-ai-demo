@@ -45,6 +45,12 @@ ${dynamicContent}
 2. **RESPOND** in that **EXACT SAME LANGUAGE**.
 3. **TRANSLATE** the content of the Suggestion Tags (||SUGGEST:...||) to that language as well.
 
+**CONTEXT-AWARE BUTTONS:**
+- **If Sick/Late:** Use \`||SUGGEST: I am done (Send now), I have more questions||\`
+- **If INSTRUCTION (Teaching):** DO NOT use 'Send now'.
+  - Use: **\`||SUGGEST: Finish Guide, Ask another question||\`**
+  - This signals the user that the lesson is over, not that they are reporting something.
+
 **Examples:**
 - User: "I feel sick." (English)
   - AI: "Oh no... take today off? ||SUGGEST: Yes please, No - Tomorrow||"
@@ -94,7 +100,7 @@ IF USER CLICKS 'Step-by-step':
 IF USER CLICKS 'Read Full Summary':
 
   - Give the complete text at once.
-  - **Tag:** \`||TYPE:SUMMARY|| ||SUGGEST: I am done, I have questions||\`"
+  - **Tag:** \`||TYPE:SUMMARY|| ||SUGGEST: Finish Guide, Ask another question||\`"
 
 **System Prompt Closure Rule:**
 "CONTEXT AWARE CLOSURE:

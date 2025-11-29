@@ -529,6 +529,30 @@ export default function MainChatScreen() {
   const handleSend = async (messageText?: string) => {
     const textToSend = messageText || input;
 
+    // Validations for New Instruction Buttons
+    if (textToSend === "Finish Guide") {
+      // Action 1: Clear History & Reset
+      setMessages([]);
+      setViewState("main");
+      setActiveFlow("none");
+      setTicketState("chat");
+      setCurrentSuggestions([]);
+      
+      // Action 2: Add History Item (Silent)
+      addHistoryItem("INFO");
+
+      // Action 3: Toast
+      alert("Guide Completed."); // Using alert as simple toast for now per requirements
+      return;
+    }
+
+    if (textToSend === "Ask another question") {
+       setCurrentSuggestions([]);
+       // Optional: Add a bot message acknowledging
+       setMessages(prev => [...prev, { role: 'assistant', content: "Sure, what would you like to know?"}]);
+       return; 
+    }
+
     // Special handling for "Ask More Questions" or "I have more questions"
     if (
       textToSend === "I have more questions" ||
@@ -1750,6 +1774,8 @@ export default function MainChatScreen() {
                           className={`px-4 py-2 rounded-full transition-all active:scale-95 ${
                             visionMode
                               ? "bg-white border-4 border-black text-black text-xl font-bold shadow-none"
+                              : s === "Finish Guide"
+                              ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 font-semibold" // Blue for Finish Guide
                               : s.includes("I am done")
                               ? "bg-gray-900 text-white shadow-md hover:bg-gray-800 font-semibold"
                               : "bg-white border border-gray-300 text-gray-700 shadow-sm hover:bg-gray-50 font-semibold"
