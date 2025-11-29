@@ -795,6 +795,17 @@ export default function MainChatScreen() {
     // NEW LOGIC: Let the AI handle the instruction flow
   };
 
+  // Helper to trigger instruction chat from menu
+  const handleInstructionClick = (categoryLabel: string) => {
+      // 1. Close menu (set to main or chat)
+      setViewState("main");
+      setTicketState("chat");
+      
+      // 2. Trigger the chat with the category name
+      // This mimics the user asking "Cleaning Tools"
+      handleSend(categoryLabel);
+  };
+
   const handleToolSelection = (tool: string) => {
     setMessages((prev) => [...prev, { role: "user", content: tool }]);
     setActiveFlow("none");
@@ -1304,9 +1315,7 @@ export default function MainChatScreen() {
                 ].map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => {
-                      if (item.id === "tool") handleCleaningTools();
-                    }}
+                    onClick={() => handleInstructionClick(item.title)}
                     className={`flex flex-col items-center justify-center transition-all cursor-pointer ${
                       visionMode
                         ? "bg-white border-4 border-black text-black shadow-none p-4 rounded-2xl"
