@@ -6,6 +6,20 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const messages = body.messages || [];
+    const language = body.language || 'English';
+
+    let targetLangName = "English";
+    if (language === 'Swedish' || language === 'sv') targetLangName = "Swedish";
+    if (language === 'Arabic' || language === 'ar') targetLangName = "Arabic";
+
+    const langInstruction = `
+**LANGUAGE PROTOCOL:**
+1. **User Preference:** The user's interface settings are set to **${targetLangName}**. Try to speak this language by default.
+2. **ADAPTABILITY (CRITICAL):** However, if the user writes/speaks in a DIFFERENT language, **YOU MUST SWITCH** to match the user's input language immediately.
+   - Example: Settings=Swedish, User="Hello" -> AI="Hi there!" (Match English).
+   - Example: Settings=English, User="Hej" -> AI="Hej!" (Match Swedish).
+3. **Tags:** Ensure suggestion tags (Yes/No buttons) are translated to the *language you are currently speaking*.
+`;
 
     // 1. DYNAMIC LOADING LOGIC
     // Check if any message contains the LOAD_FILE tag
@@ -36,14 +50,12 @@ export async function POST(req: Request) {
       messages: [
         {
           role: 'system',
-          content: `You are Enable, a supportive workplace companion...
+          content: `${langInstruction}
+
+You are Enable, a supportive workplace companion...
 
 ${dynamicContent}
 
-**LANGUAGE RULE (HIGHEST PRIORITY):**
-1. **DETECT** the language of the user's message (English, Swedish, or Arabic).
-2. **RESPOND** in that **EXACT SAME LANGUAGE**.
-3. **TRANSLATE** the content of the Suggestion Tags (||SUGGEST:...||) to that language as well.
 
 **CONTEXT-AWARE BUTTONS:**
 - **If Sick/Late:** Use \`||SUGGEST: I am done (Send now), I have more questions||\`
