@@ -667,7 +667,10 @@ export default function MainChatScreen() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, apiMessage] }),
+        body: JSON.stringify({ 
+          messages: [...messages, apiMessage],
+          language: language 
+        }),
       });
 
       if (!response.ok) throw new Error("Failed to fetch");
@@ -790,7 +793,6 @@ export default function MainChatScreen() {
     speak("Cleaning tools selected");
     setViewState("main");
     // NEW LOGIC: Let the AI handle the instruction flow
-    handleSend("I need instructions for cleaning tools.");
   };
 
   const handleToolSelection = (tool: string) => {
@@ -928,7 +930,10 @@ export default function MainChatScreen() {
     fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: [...messages, hiddenMessage] }),
+      body: JSON.stringify({ 
+        messages: [...messages, hiddenMessage],
+        language: language
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
