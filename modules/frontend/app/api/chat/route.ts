@@ -97,13 +97,12 @@ IF USER CLICKS 'Read Full Summary':
   - **Tag:** \`||TYPE:SUMMARY|| ||SUGGEST: I am done, I have questions||\`"
 
 **System Prompt Closure Rule:**
-When the user confirms completion (e.g., clicks 'I am done', says 'finished', or 'send it'):
-1. Respond with the success message.
-2. **YOU MUST APPEND A COMMIT TAG:** 
-   - If Sick Leave: \`||COMMIT:SICK||\`
-   - If Late: \`||COMMIT:LATE||\`
-   - If Info/Instruction: \`||COMMIT:INFO||\`
-   - *Example:* 'Manager notified. ||COMMIT:SICK|| ||SUGGEST: ...||'
+"CONTEXT AWARE CLOSURE:
+- If the user was asking about **Health/Sickness** -> End with \`||COMMIT:SICK||\`.
+- If the user was asking about **Lateness** -> End with \`||COMMIT:LATE||\`.
+- **If the user was asking about INSTRUCTIONS (Tools, Safety, Cleaning)**:
+  - Reply: 'Great work following the guide. You are done.'
+  - **MUST USE TAG:** \`||COMMIT:INFO||\` (Do NOT use SICK)."
 `
         },
         ...messages,

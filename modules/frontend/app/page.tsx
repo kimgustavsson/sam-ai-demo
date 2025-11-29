@@ -363,13 +363,20 @@ export default function MainChatScreen() {
 
   const addHistoryItem = (type: string) => {
     let titleKey = "ticket_sick";
+    let statusKey = "status_sent";
+
     if (type === "LATE") titleKey = "ticket_late";
-    if (type === "INFO") titleKey = "ticket_it";
+    
+    // NEW: Info Logic
+    if (type === "INFO") {
+      titleKey = "header_workplace_guide"; // "Workplace Guide"
+      statusKey = "status_done"; // "Done" (or "Viewed")
+    }
 
     const newItem = {
       title: titleKey,
       date: "Just now",
-      status: "status_sent",
+      status: statusKey,
     };
     setHistoryItems((prev) => [newItem, ...prev]);
   };
@@ -580,6 +587,12 @@ export default function MainChatScreen() {
         const commitType = commitMatch[1];
         addHistoryItem(commitType);
         cleanContent = cleanContent.replace(/\|\|COMMIT:.*?\|\|/g, "").trim();
+        
+        // CLEANUP: If it's an INFO commit, force state reset to prevent sick leave modal
+        if (commitType === 'INFO') {
+           setTicketState("chat"); // Stay in chat, do not go to summary/decision
+           setReportType(null);    // Clear any report type
+        }
       }
 
       // 2. Extract Suggestions using Regex (Robust)
@@ -990,7 +1003,10 @@ export default function MainChatScreen() {
                 </button>
 
                 <button
-                  onClick={() => setViewState("instructions")}
+                  onClick={() => {
+                    setViewState("instructions");
+                    setReportType(null); // Clear any sick leave intent
+                  }}
                   className={`flex-1 flex flex-col items-center justify-center h-40 transition-all active:scale-95 duration-200 bg-white rounded-2xl ${
                     visionMode
                       ? "border-4 border-black text-black"
