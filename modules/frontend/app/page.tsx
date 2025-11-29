@@ -785,7 +785,7 @@ export default function MainChatScreen() {
   const handleLateToWork = () => {
     speak("Late to work selected");
     setReportType("Late Arrival");
-    handleSend("I am late to work");
+    handleSend(t.chip_late);
     setViewState("main");
   };
 
@@ -1202,7 +1202,7 @@ export default function MainChatScreen() {
                       onClick={() => {
                         speak("Sick leave selected");
                         setReportType("Sick Leave");
-                        handleSend("Sick leave");
+                        handleSend(t.chip_sick);
                         setShowSuggestions(false);
                       }}
                       className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
