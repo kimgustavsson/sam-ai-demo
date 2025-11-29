@@ -68,10 +68,6 @@ const IMAGE_MAP: Record<string, string> = {
   waste:
     "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=600",
   bin: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=600",
-  level2: "https://images.pexels.com/photos/21853674/pexels-photo-21853674.jpeg",
-  chemicals: "https://images.pexels.com/photos/3735732/pexels-photo-3735732.jpeg",
-  cloths_wear: "https://images.pexels.com/photos/7876767/pexels-photo-7876767.jpeg",
-  meeting_room: "https://images.pexels.com/photos/18033206/pexels-photo-18033206.jpeg",
 };
 
 const TRANSLATIONS = {
@@ -338,6 +334,16 @@ export default function MainChatScreen() {
       "User reported not feeling well and requested sick leave. Symptoms noted. Expecting to be out for 2 days.",
   });
 
+  const INSTRUCTION_IMAGES: Record<string, string> = {
+    "level2": "https://images.pexels.com/photos/21853674/pexels-photo-21853674.jpeg",
+    "chemicals": "https://images.pexels.com/photos/3735732/pexels-photo-3735732.jpeg",
+    "cloths": "https://images.pexels.com/photos/7876767/pexels-photo-7876767.jpeg",
+    "meeting": "https://images.pexels.com/photos/18033206/pexels-photo-18033206.jpeg",
+    // Mappings for backend tags which might differ slightly
+    "cloths_wear": "https://images.pexels.com/photos/7876767/pexels-photo-7876767.jpeg", 
+    "meeting_room": "https://images.pexels.com/photos/18033206/pexels-photo-18033206.jpeg"
+  };
+
   // Instruction State
   const [activeInstruction, setActiveInstruction] = useState<{
     id: string;
@@ -589,8 +595,8 @@ export default function MainChatScreen() {
       const imageMatch = rawContent.match(/\|\|IMAGE:(.*?)\|\|/);
       if (imageMatch) {
         const imageKey = imageMatch[1].toLowerCase().trim();
-        // Look up the URL from our map, fallback to null if not found
-        const mappedUrl = IMAGE_MAP[imageKey];
+        // Look up the URL from INSTRUCTION_IMAGES (primary) or IMAGE_MAP (fallback)
+        const mappedUrl = INSTRUCTION_IMAGES[imageKey] || IMAGE_MAP[imageKey];
         if (mappedUrl) extractedImageUrl = mappedUrl;
 
         // Remove the tag from the text shown to user
@@ -656,18 +662,8 @@ export default function MainChatScreen() {
   const handleCleaningTools = () => {
     speak("Cleaning tools selected");
     setViewState("main");
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: "Where are the cleaning tools?" },
-    ]);
-
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Which tool do you need?" },
-      ]);
-      setActiveFlow("cleaning_tools_selection");
-    }, 600);
+    // NEW LOGIC: Let the AI handle the instruction flow
+    handleSend("I need instructions for cleaning tools.");
   };
 
   const handleToolSelection = (tool: string) => {
@@ -1987,7 +1983,7 @@ export default function MainChatScreen() {
             
             {/* Header */}
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="font-display text-2xl font-bold text-gray-900">Full Summary</h3>
+              <h3 className="font-display text-2xl font-bold text-gray-900">Instruction Summary</h3>
               <button 
                 onClick={() => setSummaryCardContent(null)}
                 className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
