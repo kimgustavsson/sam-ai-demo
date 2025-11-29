@@ -557,7 +557,7 @@ export default function MainChatScreen() {
     if (language === "Swedish") {
       apiMessageContent += " (VIKTIGT: Svara på SVENSKA)";
     } else if (language === "Arabic") {
-      apiMessageContent += " (IMPORTANT: Reply in ARABIC)";
+      apiMessageContent += " (مهم: أجب بالعربية)";
     }
 
     // STEPPING LOGIC (Stateful Iterator)
