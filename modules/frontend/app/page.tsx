@@ -143,6 +143,12 @@ const TRANSLATIONS = {
     status_sent: "Sent",
     status_review: "Reviewing",
     status_done: "Done",
+    val_sick_type: "Sick Leave",
+    val_sick_details: "Reporting sick leave for Today. Get well soon.",
+    val_late_type: "Late Arrival",
+    val_late_details: "Arriving late. Drive safely.",
+    btn_confirm: "Confirm & Send",
+    btn_edit: "Edit",
   },
   Swedish: {
     welcome: "Hej",
@@ -215,6 +221,12 @@ const TRANSLATIONS = {
     status_sent: "Skickad",
     status_review: "Granskas",
     status_done: "Klar",
+    val_sick_type: "Sjukfrånvaro",
+    val_sick_details: "Rapporterar sjukfrånvaro för idag. Krya på dig.",
+    val_late_type: "Sen Ankomst",
+    val_late_details: "Kommer sent. Kör försiktigt.",
+    btn_confirm: "Bekräfta & Skicka",
+    btn_edit: "Redigera",
   },
   Arabic: {
     welcome: "مرحبا",
@@ -287,6 +299,12 @@ const TRANSLATIONS = {
     status_sent: "تم الإرسال",
     status_review: "قيد المراجعة",
     status_done: "تم",
+    val_sick_type: "إجازة مرضية",
+    val_sick_details: "إبلاغ عن إجازة مرضية لليوم. نتمنى لك الشفاء العاجل.",
+    val_late_type: "تأخر عن العمل",
+    val_late_details: "سأتأخر في الوصول. قد بأمان.",
+    btn_confirm: "تأكيد وإرسال",
+    btn_edit: "تعديل",
   },
 };
 
@@ -943,8 +961,8 @@ export default function MainChatScreen() {
                 </label>
                 <div className="text-lg font-medium text-gray-800">
                   {reportType === "Late Arrival"
-                    ? "Late Arrival"
-                    : "Sick Leave"}
+                    ? t.val_late_type
+                    : t.val_sick_type}
                 </div>
               </div>
 
@@ -954,17 +972,13 @@ export default function MainChatScreen() {
                 </label>
                 <p className="text-base text-gray-600 mt-1 bg-gray-50 p-3 rounded-xl">
                   {reportType === "Late Arrival"
-                    ? `Arriving in ${
-                        arrivalEstimate.match(/\d$/)
-                          ? arrivalEstimate + " mins"
-                          : arrivalEstimate
-                      }`
-                    : summaryData.details}
+                    ? (arrivalEstimate ? t.val_late_details + " (" + arrivalEstimate + ")" : t.val_late_details)
+                    : t.val_sick_details}
                 </p>
               </div>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col gap-3">
               <button
                 onClick={() => {
                   const newItem = {
@@ -986,7 +1000,13 @@ export default function MainChatScreen() {
                 }}
                 className="w-full bg-primary text-white text-lg font-semibold py-4 rounded-2xl shadow-lg hover:bg-primary/90 transition-all active:scale-95"
               >
-                {t.btn_send_manager}
+                {t.btn_confirm}
+              </button>
+              <button
+                onClick={() => setTicketState("chat")}
+                className="w-full bg-gray-100 text-gray-700 text-lg font-semibold py-4 rounded-2xl hover:bg-gray-200 transition-all active:scale-95"
+              >
+                {t.btn_edit}
               </button>
             </div>
           </div>
