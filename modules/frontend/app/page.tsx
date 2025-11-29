@@ -552,6 +552,14 @@ export default function MainChatScreen() {
     const textToSend = messageText || input;
     let apiMessageContent = textToSend;
 
+    // FORCE LANGUAGE INSTRUCTION (Hidden from UI)
+    // This ensures the AI responds in the selected language even if the button text is English
+    if (language === "Swedish") {
+      apiMessageContent += " (VIKTIGT: Svara på SVENSKA)";
+    } else if (language === "Arabic") {
+      apiMessageContent += " (IMPORTANT: Reply in ARABIC)";
+    }
+
     // STEPPING LOGIC (Stateful Iterator)
     const lowText = textToSend.toLowerCase();
     
