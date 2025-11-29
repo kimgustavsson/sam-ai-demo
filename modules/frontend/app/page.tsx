@@ -609,7 +609,7 @@ export default function MainChatScreen() {
 
                 return (
                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] p-4 rounded-2xl ${msg.role === 'user' ? 'bg-primary text-white rounded-br-none' : 'bg-white text-gray-800 shadow-md rounded-bl-none'}`}>
+                    <div className={`max-w-[80%] p-4 rounded-2xl ${msg.role === 'user' ? 'bg-gray-100 text-gray-900 rounded-br-none' : 'bg-white text-gray-800 shadow-md rounded-bl-none'}`}>
                          <div className="text-sm leading-relaxed">
                             <ReactMarkdown components={{
                                 strong: ({node, ...props}) => <span className="font-bold text-[#9747FF]" {...props} />
@@ -669,7 +669,7 @@ export default function MainChatScreen() {
 
             {isLoading && (
                  <div className="flex justify-start">
-                    <div className="p-4 bg-white rounded-2xl rounded-bl-none text-gray-500 animate-pulse shadow-sm">
+                    <div className="max-w-[80%] p-4 rounded-2xl bg-white text-gray-500 shadow-md rounded-bl-none animate-pulse">
                         Thinking...
                     </div>
                  </div>
@@ -765,64 +765,18 @@ export default function MainChatScreen() {
             })}
         </div>
 
-        {/* Language Accordion */}
-        <div className="w-full bg-[#9747FF] rounded-2xl overflow-hidden shadow-md mt-2 transition-all duration-300 ease-in-out">
-            <button 
-                onClick={() => setIsLanguageOpen(!isLanguageOpen)}
-                className="w-full p-4 flex justify-between items-center text-white"
+        {/* Language Selector */}
+        <div className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
+            <span className="font-bold text-gray-800 text-lg">Language</span>
+            <select 
+                className="bg-gray-50 border border-gray-300 text-gray-800 text-base rounded-lg focus:ring-primary focus:border-primary block p-2.5 min-w-[120px]"
+                defaultValue="English"
             >
-                <span className="font-semibold">Language</span>
-                <div className="flex items-center space-x-2">
-                    <Globe className="w-5 h-5" />
-                    <span className="font-medium">English</span>
-                    {isLanguageOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                </div>
-            </button>
-            
-            {isLanguageOpen && (
-                <div className="bg-[#863ee0] px-4 pb-2 animate-in slide-in-from-top-2 duration-200">
-                    {['English', 'Arabic', 'Swedish'].map((lang) => (
-                        <button 
-                            key={lang}
-                            className="w-full text-left py-3 text-white hover:bg-white/10 rounded-lg px-2 font-medium transition-colors border-b border-white/10 last:border-0"
-                            onClick={() => setIsLanguageOpen(false)}
-                        >
-                            {lang}
-                        </button>
-                    ))}
-                </div>
-            )}
+                <option value="English">English</option>
+                <option value="Swedish">Swedish</option>
+                <option value="Arabic">Arabic</option>
+            </select>
         </div>
-
-        {/* Text Size Control */}
-        <div className="w-full bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col space-y-4">
-            <div className="flex justify-between items-center">
-                <span className="font-bold text-gray-800">Text Size</span>
-                <span className="text-gray-500 font-medium">
-                    {textSizeMode === 'Normal' ? '16px' : textSizeMode === 'Large' ? '20px' : '24px'}
-                </span>
-            </div>
-            
-            <div className="flex space-x-2 bg-gray-50 p-1.5 rounded-xl">
-                {['Normal', 'Large', 'Huge'].map((size) => (
-                    <button
-                        key={size}
-                        onClick={() => handleTextSizeChange(size as any)}
-                        className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-                            textSizeMode === size 
-                            ? 'bg-[#9747FF] text-white shadow-sm' 
-                            : 'text-gray-500 hover:bg-gray-200'
-                        }`}
-                    >
-                        {size}
-                    </button>
-                ))}
-            </div>
-        </div>
-
-        <button className="w-full py-4 bg-red-50 text-red-600 font-bold text-lg rounded-xl border border-red-200 hover:bg-red-100 transition-all active:scale-95">
-            Log out
-        </button>
       </div>
   );
 
@@ -868,7 +822,7 @@ export default function MainChatScreen() {
                                         handleSend(s);
                                     }
                                 }}
-                                className="px-4 py-2 bg-purple-100 text-primary rounded-full font-semibold shadow-sm border border-purple-200 hover:bg-purple-200 active:scale-95 transition-all"
+                                className="px-4 py-2 bg-white text-gray-800 rounded-full font-semibold shadow-sm border border-gray-300 hover:bg-gray-50 active:scale-95 transition-all"
                             >
                                 {s}
                             </button>
