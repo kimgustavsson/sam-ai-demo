@@ -35,6 +35,7 @@ export default function MainChatScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [reportType, setReportType] = useState<'Sick Leave' | 'Late Arrival' | null>(null);
   const [arrivalEstimate, setArrivalEstimate] = useState<string>('');
+  const [currentSuggestions, setCurrentSuggestions] = useState<string[]>([]);
   const [summaryData, setSummaryData] = useState({ type: 'Sick Leave', details: 'User reported not feeling well and requested sick leave. Symptoms noted. Expecting to be out for 2 days.' });
   
   // Instruction State
@@ -85,25 +86,12 @@ export default function MainChatScreen() {
     }
   }, [messages, isLoading, currentTab]);
 
-  // Effect to handle "I am done" suggestion automatically
+  // Effect to handle "I am done" suggestion automatically via state
   useEffect(() => {
-      if (messages.length > 0) {
-          const lastMsg = messages[messages.length - 1];
-          if (lastMsg.role === 'assistant') {
-               const hiddenTagRegex = /\|\|.*?\|\|/g;
-               const tags = lastMsg.content.match(hiddenTagRegex) || [];
-               
-               const suggestTag = tags.find(t => t.startsWith('||SUGGEST:'));
-               const suggestions = suggestTag 
-                    ? suggestTag.replace('||SUGGEST:', '').replace('||', '').split(',').map(s => s.trim())
-                    : [];
-               
-               if (suggestions.some(s => s.includes('I am done')) && ticketState === 'chat') {
-                   setTicketState('decision');
-               }
-          }
+      if (currentSuggestions.some(s => s.includes('I am done')) && ticketState === 'chat') {
+           setTicketState('decision');
       }
-  }, [messages, ticketState]);
+  }, [currentSuggestions, ticketState]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -158,6 +146,9 @@ export default function MainChatScreen() {
 
     const userMessage = { role: 'user', content: textToSend };
     setMessages(prev => [...prev, userMessage]);
+    // Clear suggestions when user replies
+    setCurrentSuggestions([]); 
+
     if (!messageText) setInput(''); 
     setIsLoading(true);
 
@@ -172,13 +163,28 @@ export default function MainChatScreen() {
 
       const data = await response.json();
       
-      let content = data.content || "";
-      if (content.includes('[COMPLETE]')) {
-        content = content.replace('[COMPLETE]', '').trim();
+      const rawContent = data.content || "";
+      let cleanContent = rawContent;
+      let newSuggestions: string[] = [];
+
+      // 1. Extract Suggestions using Regex (Robust)
+      const suggestMatch = rawContent.match(/\|\|SUGGEST:(.*?)\|\|/);
+      if (suggestMatch) {
+          const optionsString = suggestMatch[1];
+          newSuggestions = optionsString.split(',').map((s: string) => s.trim());
+          // Remove the tag from the text shown to user
+          cleanContent = rawContent.replace(/\|\|SUGGEST:.*?\|\|/g, '').trim();
+      }
+      
+      // Handle legacy or other tags if needed
+      if (cleanContent.includes('[COMPLETE]')) {
+        cleanContent = cleanContent.replace('[COMPLETE]', '').trim();
         setTicketState('decision');
       }
 
-      setMessages(prev => [...prev, { role: data.role, content }]);
+      setMessages(prev => [...prev, { role: data.role, content: cleanContent }]);
+      setCurrentSuggestions(newSuggestions);
+
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -202,6 +208,7 @@ export default function MainChatScreen() {
       setSelectedImage(null);
       setReportType(null);
       setArrivalEstimate('');
+      setCurrentSuggestions([]);
     } else {
       setCurrentTab('home');
     }
@@ -209,10 +216,8 @@ export default function MainChatScreen() {
 
   const handleLateToWork = () => {
     setReportType('Late Arrival');
-    setActiveFlow('late_to_work');
+    handleSend("I am late to work");
     setViewState('main');
-    const question = "When will you arrive?";
-    setMessages(prev => [...prev, { role: 'assistant', content: question }]);
   };
 
   const handleCleaningTools = () => {
@@ -588,23 +593,14 @@ export default function MainChatScreen() {
     return (
         <div className="w-full flex flex-col space-y-4 pb-4 pt-4">
             {messages.map((msg, index) => {
-                // Tag stripping logic
-                let displayContent = msg.content;
-                const hiddenTagRegex = /\|\|.*?\|\|/g;
-                const tags = displayContent.match(hiddenTagRegex) || [];
-                displayContent = displayContent.replace(hiddenTagRegex, '').trim();
-
-                // Check for suggestion tags
-                const suggestTag = tags.find(t => t.startsWith('||SUGGEST:'));
-                const suggestions = suggestTag 
-                    ? suggestTag.replace('||SUGGEST:', '').replace('||', '').split(',').map(s => s.trim())
-                    : [];
-
-                // Legacy split check (keeping for compatibility if needed, though we are moving to ||TAG||)
-                const [textPart, suggestionPart] = displayContent.split('[SUGGESTION|');
+                // Simplified render loop - no more heavy parsing here
+                // We use handleSend to parse suggestions now
+                
+                // Legacy split check (keeping for fallback compatibility if needed)
+                // This logic can be removed if strict tagging is fully enforced, 
+                // but good to keep for safety if older messages exist
+                const [textPart, suggestionPart] = msg.content.split('[SUGGESTION|');
                 const legacySuggestion = suggestionPart ? suggestionPart.replace(']', '').split('|') : null;
-
-                const hasDoneSuggestion = suggestions.some(s => s.includes('I am done'));
 
                 return (
                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -613,33 +609,12 @@ export default function MainChatScreen() {
                             <ReactMarkdown components={{
                                 strong: ({node, ...props}) => <span className="font-bold text-[#9747FF]" {...props} />
                             }}>
-                                {displayContent}
+                                {textPart || msg.content}
                             </ReactMarkdown>
                         </div>
                         
                         {msg.image && (
                             <img src={msg.image} alt="Reference" className="rounded-xl mt-2 mb-1 w-full h-48 object-cover border border-gray-200" />
-                        )}
-
-                        {/* Render Suggestion Chips */}
-                         {suggestions.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-3">
-                                {suggestions.map((s, i) => (
-                                    <button 
-                                        key={i}
-                                        onClick={() => {
-                                            if (s.includes('I am done')) {
-                                                setTicketState('summary'); 
-                                            } else {
-                                                handleSend(s);
-                                            }
-                                        }}
-                                        className="px-3 py-2 bg-purple-50 text-primary text-sm font-semibold rounded-lg border border-purple-100 hover:bg-purple-100 transition-colors text-left"
-                                    >
-                                        {s}
-                                    </button>
-                                ))}
-                            </div>
                         )}
 
                         {legacySuggestion && (
@@ -874,6 +849,28 @@ export default function MainChatScreen() {
             
             {/* Chips */}
             <div className="pointer-events-auto flex flex-wrap justify-center gap-2 mb-4 animate-in slide-in-from-bottom-4 duration-300">
+                
+                {/* New Dynamic Suggestions from AI (Hidden if in Decision Mode) */}
+                {currentSuggestions.length > 0 && ticketState !== 'decision' && (
+                    <>
+                        {currentSuggestions.map((s, i) => (
+                            <button 
+                                key={i}
+                                onClick={() => {
+                                    if (s.includes('I am done')) {
+                                        setTicketState('summary'); 
+                                    } else {
+                                        handleSend(s);
+                                    }
+                                }}
+                                className="px-4 py-2 bg-purple-100 text-primary rounded-full font-semibold shadow-sm border border-purple-200 hover:bg-purple-200 active:scale-95 transition-all"
+                            >
+                                {s}
+                            </button>
+                        ))}
+                    </>
+                )}
+
                 {activeFlow === 'cleaning_tools_selection' && (
                     <>
                         {["Mops", "Cloths", "Chemicals"].map((tool) => (
@@ -884,11 +881,6 @@ export default function MainChatScreen() {
                     </>
                 )}
 
-                {activeFlow === 'late_to_work' && ["10 mins", "30 mins", "1 hour"].map((time) => (
-                    <button key={time} onClick={() => { setMessages(prev => [...prev, { role: 'user', content: time }, { role: 'assistant', content: "Understood. I have notified your manager." }]); setArrivalEstimate(time); setTicketState('summary'); }} className="px-4 py-2 bg-purple-100 text-primary rounded-full font-semibold shadow-sm border border-purple-200 hover:bg-purple-200 active:scale-95 transition-all">
-                        {time}
-                    </button>
-                ))}
 
                 {activeFlow === 'call_manager' && (
                     <button onClick={handleCallManager} className="flex items-center space-x-2 px-6 py-3 bg-green-500 text-white rounded-full font-bold shadow-lg hover:bg-green-600 active:scale-95 transition-all">
@@ -918,7 +910,7 @@ export default function MainChatScreen() {
             {/* Decision or Input */}
             {ticketState === 'decision' ? (
                 <div className="w-full flex flex-col space-y-3 animate-in slide-in-from-bottom-10 duration-300">
-                    <button onClick={() => setTicketState('summary')} className="w-full bg-primary text-white text-lg font-semibold py-3 rounded-2xl shadow-lg hover:bg-primary/90 active:scale-95 transition-all">I am done</button>
+                    <button onClick={() => setTicketState('summary')} className="w-full bg-primary text-white text-lg font-semibold py-3 rounded-2xl shadow-lg hover:bg-primary/90 active:scale-95 transition-all">I am done (Submit)</button>
                     <button onClick={() => setTicketState('chat')} className="w-full bg-white text-primary text-lg font-semibold py-3 rounded-2xl border-2 border-purple-100 hover:bg-purple-50 active:scale-95 transition-all">Ask More Questions</button>
                 </div>
             ) : (
