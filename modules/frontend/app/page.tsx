@@ -357,6 +357,7 @@ export default function MainChatScreen() {
   } | null>(null);
 
   const [summaryCardContent, setSummaryCardContent] = useState<string | null>(null);
+  const [currentInstructionStep, setCurrentInstructionStep] = useState(0);
 
   // History State - "My Requests"
   const [historyItems, setHistoryItems] = useState([
@@ -531,6 +532,30 @@ export default function MainChatScreen() {
 
   const handleSend = async (messageText?: string) => {
     const textToSend = messageText || input;
+    let apiMessageContent = textToSend;
+
+    // STEPPING LOGIC (Stateful Iterator)
+    const lowText = textToSend.toLowerCase();
+    
+    // 1. Start Instruction Mode (Force Step 1)
+    if (lowText.includes("step-by-step")) {
+       setCurrentInstructionStep(1);
+       apiMessageContent += " ||REQUEST_STEP:1||";
+    }
+    // 2. Advance Step
+    else if (
+        lowText.includes("next step") || 
+        lowText.includes("done (next") ||
+        lowText.includes("ready")
+    ) {
+         const nextStep = currentInstructionStep + 1;
+         setCurrentInstructionStep(nextStep);
+         apiMessageContent += ` ||REQUEST_STEP:${nextStep}||`;
+    }
+    // 3. Repeat Step (Show me again)
+    else if (lowText.includes("show me again") || lowText.includes("repeat")) {
+         apiMessageContent += ` ||REQUEST_STEP:${currentInstructionStep}||`;
+    }
 
     // Validations for New Instruction Buttons
     if (textToSend.includes("Finish Guide")) {
@@ -600,18 +625,23 @@ export default function MainChatScreen() {
     }
 
     const userMessage = { role: "user", content: textToSend };
+    // We put the CLEAN text in the UI
     setMessages((prev) => [...prev, userMessage]);
+    
     // Clear suggestions when user replies
     setCurrentSuggestions([]);
 
     if (!messageText) setInput("");
     setIsLoading(true);
+    
+    // We send the SYSTEM TAGGED text to the Backend
+    const apiMessage = { role: "user", content: apiMessageContent };
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ messages: [...messages, apiMessage] }),
       });
 
       if (!response.ok) throw new Error("Failed to fetch");
@@ -647,9 +677,12 @@ export default function MainChatScreen() {
       }
 
       // 2.5. Enforce Final Closure Logic (FIX)
-      if (rawContent.includes("||FINAL_STEP_DONE||")) {
-        // Remove the tag
-        cleanContent = cleanContent.replace("||FINAL_STEP_DONE||", "").trim();
+      if (rawContent.includes("||FINAL_STEP_DONE||") || rawContent.includes("||LAST_STEP_DONE||")) {
+        // Remove the tags
+        cleanContent = cleanContent
+          .replace("||FINAL_STEP_DONE||", "")
+          .replace("||LAST_STEP_DONE||", "")
+          .trim();
         
         // Filter suggestions: Keep ONLY "Finish Guide" and "Ask another question" (or translations)
         // We remove the known "Loop" buttons like "Done (Next step)", "Repeat", "Show me again"
@@ -1810,15 +1843,9 @@ export default function MainChatScreen() {
                           onClick={() => {
                             if (s.includes("I am done")) {
                               setTicketState("summary");
-                            } else if (
-                              s.toLowerCase().includes("next") ||
-                              s.toLowerCase().includes("step") ||
-                              s.toLowerCase() === "ready" ||
-                              s.toLowerCase() === "done"
-                            ) {
-                              // Prompt 137 Fix: Force "Next step please" to ensure iterators work
-                              handleSend("Next step please");
                             } else {
+                              // Standard handler sends the suggestion text exactly
+                              // The handleSend logic will intercept 'Next step', 'Step-by-step', etc.
                               handleSend(s);
                             }
                           }}
