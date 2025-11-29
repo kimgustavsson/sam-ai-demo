@@ -4,7 +4,7 @@ import "./globals.css";
 import SplashScreen from "./components/SplashScreen";
 
 export const metadata: Metadata = {
-  title: "Chat Assistant",
+  title: "Enable",
   description: "Mobile chat assistant interface",
 };
 

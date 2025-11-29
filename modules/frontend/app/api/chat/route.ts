@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       apiKey: apiKey,
       defaultHeaders: {
         'HTTP-Referer': 'http://localhost:3000',
-        'X-Title': 'Samhall AI Assistant',
+        'X-Title': 'Enable Assistant',
       },
     });
 
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       messages: [
         {
           role: 'system',
-          content: `You are SAM AI.
+          content: `You are Enable, a supportive workplace companion...
 
 ${dynamicContent}
 

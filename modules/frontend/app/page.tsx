@@ -73,7 +73,7 @@ const IMAGE_MAP: Record<string, string> = {
 const TRANSLATIONS = {
   English: {
     welcome: "Hi",
-    greeting: "How can I help you today?",
+    greeting: "How can Enable help you today?",
     btn_questions: "Quick Questions",
     btn_instructions: "Instruction Files",
     tab_home: "Home",

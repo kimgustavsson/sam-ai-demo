@@ -29,12 +29,12 @@ export default function SplashScreen() {
         <div className="relative z-10 flex flex-col items-center text-center -mt-20 animate-in zoom-in-90 duration-1000">
             
             {/* Title with Moving Gradient */}
-            <h1 className="font-display text-6xl font-black tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600 bg-[length:200%_auto] animate-gradient pb-2">
-                SAM AI
+            <h1 className="font-display text-6xl font-black tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-orange-500 bg-[length:200%_auto] animate-gradient pb-2">
+                Enable
             </h1>
 
             {/* Subtitle */}
-            <p className="font-sans text-xl text-slate-500 font-medium mt-4 animate-in slide-in-from-bottom-8 fade-in duration-1000 delay-200 fill-mode-forwards">
+            <p className="uppercase tracking-[0.2em] font-light text-slate-400 text-sm mt-4 animate-in slide-in-from-bottom-8 fade-in duration-1000 delay-200 fill-mode-forwards">
                 Work without barriers
             </p>
 
@@ -42,7 +42,7 @@ export default function SplashScreen() {
 
         {/* Footer Branding */}
         <div className="absolute bottom-10 relative z-10 text-gray-400 text-sm font-sans animate-in fade-in duration-1000 delay-500 fill-mode-forwards">
-            Run by <strong>Anduril</strong>
+            Run by Anduril 1.0
         </div>
     </div>
   );
