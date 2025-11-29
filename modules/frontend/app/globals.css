@@ -24,3 +24,13 @@
 .animate-gradient {
   animation: gradient 3s ease infinite;
 }
+
+@keyframes blink {
+  0% { opacity: 0.2; }
+  20% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.animate-blink {
+  animation: blink 1.4s infinite both;
+}

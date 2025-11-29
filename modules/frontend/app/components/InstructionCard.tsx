@@ -3,14 +3,27 @@ import React from 'react';
 interface InstructionCardProps {
   imageSrc: string;
   text: string;
+  visionMode?: boolean;
 }
 
-export const InstructionCard: React.FC<InstructionCardProps> = ({ imageSrc, text }) => {
+export const InstructionCard: React.FC<InstructionCardProps> = ({ imageSrc, text, visionMode }) => {
   return (
-    <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mt-2">
+    <div className={`w-full max-w-sm overflow-hidden mt-2 ${
+      visionMode 
+        ? "bg-white border-4 border-black shadow-none rounded-xl" 
+        : "bg-white rounded-2xl shadow-sm border border-gray-200"
+    }`}>
       {/* Header */}
-      <div className="bg-[#9747FF] px-4 py-2">
-        <span className="font-bold text-sm text-white">Work Instruction</span>
+      <div className={`px-4 py-2 ${
+        visionMode 
+          ? "bg-black" 
+          : "bg-[#9747FF]"
+      }`}>
+        <span className={`font-bold ${
+          visionMode 
+            ? "text-xl text-white" 
+            : "text-sm text-white"
+        }`}>Work Instruction</span>
       </div>
 
       {/* Image Area */}
@@ -24,7 +37,11 @@ export const InstructionCard: React.FC<InstructionCardProps> = ({ imageSrc, text
 
       {/* Body */}
       <div className="p-4">
-        <p className="text-lg text-gray-800 font-medium leading-relaxed">
+        <p className={`leading-relaxed ${
+          visionMode 
+            ? "text-black font-bold text-lg" 
+            : "text-lg text-gray-800 font-medium"
+        }`}>
           {text}
         </p>
       </div>

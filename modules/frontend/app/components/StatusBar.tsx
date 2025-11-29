@@ -1,9 +1,13 @@
 import React from 'react';
 import { Signal, Battery, Wifi, Leaf } from 'lucide-react';
 
-export const StatusBar = () => {
+interface StatusBarProps {
+  visionMode?: boolean;
+}
+
+export const StatusBar = ({ visionMode = false }: StatusBarProps) => {
   return (
-    <div className="absolute top-0 left-0 w-full h-12 z-50 flex justify-between items-center px-6 bg-white/80 backdrop-blur-sm text-black font-bold text-sm select-none border-b border-gray-100/50">
+    <div className={`absolute top-0 left-0 w-full h-12 z-50 flex justify-between items-center px-6 text-black font-bold text-sm select-none border-b transition-all duration-300 ${visionMode ? 'bg-white border-black border-b-2' : 'bg-white/80 backdrop-blur-sm border-gray-100/50'}`}>
        {/* Left: Time */}
        <div className="flex-1 flex justify-start">
           <span className="font-sans text-gray-900">12:30</span>
