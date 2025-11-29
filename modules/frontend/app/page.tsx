@@ -1770,6 +1770,14 @@ export default function MainChatScreen() {
                           onClick={() => {
                             if (s.includes("I am done")) {
                               setTicketState("summary");
+                            } else if (
+                              s.toLowerCase().includes("next") ||
+                              s.toLowerCase().includes("step") ||
+                              s.toLowerCase() === "ready" ||
+                              s.toLowerCase() === "done"
+                            ) {
+                              // Prompt 137 Fix: Force "Next step please" to ensure iterators work
+                              handleSend("Next step please");
                             } else {
                               handleSend(s);
                             }
