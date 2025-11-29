@@ -158,15 +158,30 @@ When asked about a cleaning task (Tools, Chemicals, Cloths, etc.):
   - **MUST USE TAG:** \`||COMMIT:INFO||\` (Do NOT use SICK)."
 `;
 
+    // Prepare the final message list
+    const finalMessages = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...messages,
+    ];
+
+    // === THE ENFORCER ===
+    // Add a final system instruction based on the selected language
+    if (language === 'Swedish' || language === 'sv') {
+      finalMessages.push({
+        role: 'system',
+        content: "CRITICAL: The user has selected SWEDISH. Even if the previous input was English (e.g. button labels), YOU MUST REPLY IN SWEDISH. Translate everything."
+      });
+    } else if (language === 'Arabic' || language === 'ar') {
+      finalMessages.push({
+        role: 'system',
+        content: "CRITICAL: The user has selected ARABIC. You MUST REPLY IN ARABIC. Translate everything."
+      });
+    }
+
     const completion = await openai.chat.completions.create({
       model: 'google/gemini-2.0-flash-exp:free', 
-      messages: [
-        {
-          role: 'system',
-          content: SYSTEM_PROMPT
-        },
-        ...messages,
-      ],
+      // @ts-ignore
+      messages: finalMessages,
     });
 
     const reply = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
