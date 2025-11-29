@@ -35,6 +35,7 @@ import {
   Siren,
   CircleHelp,
   Paperclip,
+  Volume2,
 } from "lucide-react";
 import CallOverlay from "./components/CallOverlay";
 import { StatusBar } from "./components/StatusBar";
@@ -67,6 +68,10 @@ const IMAGE_MAP: Record<string, string> = {
   waste:
     "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=600",
   bin: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=600",
+  level2: "https://images.pexels.com/photos/21853674/pexels-photo-21853674.jpeg",
+  chemicals: "https://images.pexels.com/photos/3735732/pexels-photo-3735732.jpeg",
+  cloths_wear: "https://images.pexels.com/photos/7876767/pexels-photo-7876767.jpeg",
+  meeting_room: "https://images.pexels.com/photos/18033206/pexels-photo-18033206.jpeg",
 };
 
 const TRANSLATIONS = {
@@ -342,6 +347,8 @@ export default function MainChatScreen() {
     color: string;
   } | null>(null);
 
+  const [summaryCardContent, setSummaryCardContent] = useState<string | null>(null);
+
   // History State - "My Requests"
   const [historyItems, setHistoryItems] = useState([
     { title: "ticket_it", date: "Nov 15, 2025", status: "status_done" },
@@ -375,7 +382,7 @@ export default function MainChatScreen() {
   });
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [visionMode, setVisionMode] = useState(false);
-  
+
   // New Settings State
   const [selectedMode, setSelectedMode] = useState("Standard");
   const [textSizeMode, setTextSizeMode] = useState("Normal");
@@ -588,6 +595,14 @@ export default function MainChatScreen() {
 
         // Remove the tag from the text shown to user
         cleanContent = cleanContent.replace(/\|\|IMAGE:.*?\|\|/g, "").trim();
+      }
+
+      // 4. Extract Summary Tag
+      if (rawContent.includes("||TYPE:SUMMARY||")) {
+        // Strip the tag
+        cleanContent = cleanContent.replace("||TYPE:SUMMARY||", "").trim();
+        // Set the State to trigger the Card UI
+        setSummaryCardContent(cleanContent);
       }
 
       // Handle legacy or other tags if needed
@@ -967,7 +982,13 @@ export default function MainChatScreen() {
                       }`}
                     />
                   </div>
-                  <span className={`text-lg ${visionMode ? "font-bold text-black" : "font-medium text-gray-800"}`}>
+                  <span
+                    className={`text-lg ${
+                      visionMode
+                        ? "font-bold text-black"
+                        : "font-medium text-gray-800"
+                    }`}
+                  >
                     {t.btn_questions}
                   </span>
                 </button>
@@ -992,7 +1013,13 @@ export default function MainChatScreen() {
                       }`}
                     />
                   </div>
-                  <span className={`text-lg ${visionMode ? "font-bold text-black" : "font-medium text-gray-800"}`}>
+                  <span
+                    className={`text-lg ${
+                      visionMode
+                        ? "font-bold text-black"
+                        : "font-medium text-gray-800"
+                    }`}
+                  >
                     {t.btn_instructions}
                   </span>
                 </button>
@@ -1022,56 +1049,56 @@ export default function MainChatScreen() {
                         handleSend("Sick leave");
                         setShowSuggestions(false);
                       }}
-                          className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
-                            visionMode
-                              ? "border-4 border-black text-black text-xl font-bold shadow-none"
-                              : "text-sm border border-[#9747FF] text-[#9747FF] hover:bg-purple-50 active:scale-95"
-                          }`}
-                        >
-                          {t.chip_sick}
-                        </button>
+                      className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
+                        visionMode
+                          ? "border-4 border-black text-black text-xl font-bold shadow-none"
+                          : "text-sm border border-[#9747FF] text-[#9747FF] hover:bg-purple-50 active:scale-95"
+                      }`}
+                    >
+                      {t.chip_sick}
+                    </button>
 
                     <button
                       onClick={() => {
                         handleLateToWork();
                         setShowSuggestions(false);
                       }}
-                          className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
-                            visionMode
-                              ? "border-4 border-black text-black text-xl font-bold shadow-none"
-                              : "text-sm border border-[#9747FF] text-[#9747FF] hover:bg-purple-50 active:scale-95"
-                          }`}
-                        >
-                          {t.chip_late}
-                        </button>
+                      className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
+                        visionMode
+                          ? "border-4 border-black text-black text-xl font-bold shadow-none"
+                          : "text-sm border border-[#9747FF] text-[#9747FF] hover:bg-purple-50 active:scale-95"
+                      }`}
+                    >
+                      {t.chip_late}
+                    </button>
 
                     <button
                       onClick={() => {
                         handleReportProblem();
                         setShowSuggestions(false);
                       }}
-                          className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
-                            visionMode
-                              ? "border-4 border-black text-black text-xl font-bold shadow-none"
-                              : "text-sm border border-[#9747FF] text-[#9747FF] hover:bg-purple-50 active:scale-95"
-                          }`}
-                        >
-                          {t.chip_problem}
-                        </button>
+                      className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
+                        visionMode
+                          ? "border-4 border-black text-black text-xl font-bold shadow-none"
+                          : "text-sm border border-[#9747FF] text-[#9747FF] hover:bg-purple-50 active:scale-95"
+                      }`}
+                    >
+                      {t.chip_problem}
+                    </button>
 
                     <button
                       onClick={() => {
                         handleUploadNote();
                         setShowSuggestions(false);
                       }}
-                          className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
-                            visionMode
-                              ? "border-4 border-black text-black text-xl font-bold shadow-none"
-                              : "text-sm border border-[#9747FF] text-[#9747FF] hover:bg-purple-50 active:scale-95"
-                          }`}
-                        >
-                          {t.chip_upload}
-                        </button>
+                      className={`px-4 py-2 bg-white rounded-full font-medium transition-all ${
+                        visionMode
+                          ? "border-4 border-black text-black text-xl font-bold shadow-none"
+                          : "text-sm border border-[#9747FF] text-[#9747FF] hover:bg-purple-50 active:scale-95"
+                      }`}
+                    >
+                      {t.chip_upload}
+                    </button>
                   </div>
                 </div>
               )}
@@ -1288,7 +1315,12 @@ export default function MainChatScreen() {
                   <ReactMarkdown
                     components={{
                       strong: ({ node, ...props }) => (
-                        <span className={`font-bold ${visionMode ? "text-black" : "text-[#9747FF]"}`} {...props} />
+                        <span
+                          className={`font-bold ${
+                            visionMode ? "text-black" : "text-[#9747FF]"
+                          }`}
+                          {...props}
+                        />
                       ),
                     }}
                   >
@@ -1857,9 +1889,7 @@ export default function MainChatScreen() {
                     }`}
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    <Paperclip
-                      className={visionMode ? "w-6 h-6" : "w-5 h-5"}
-                    />
+                    <Paperclip className={visionMode ? "w-6 h-6" : "w-5 h-5"} />
                   </button>
                   <button
                     className={`p-2 transition-colors ${
@@ -1947,6 +1977,52 @@ export default function MainChatScreen() {
             >
               {t.btn_close}
             </button>
+          </div>
+        </div>
+      )}
+
+      {summaryCardContent && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl relative animate-in slide-in-from-bottom duration-300">
+            
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="font-display text-2xl font-bold text-gray-900">Full Summary</h3>
+              <button 
+                onClick={() => setSummaryCardContent(null)}
+                className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="overflow-y-auto p-6 space-y-6">
+               {/* Read Aloud Button */}
+               <button
+                onClick={() => speak(summaryCardContent)}
+                className="w-full flex items-center justify-center space-x-3 bg-purple-50 border border-purple-100 rounded-xl p-4 hover:bg-purple-100 transition-colors group"
+              >
+                <div className="bg-white p-2 rounded-full shadow-sm group-active:scale-95 transition-transform">
+                  <Volume2 className="w-6 h-6 text-[#9747FF]" />
+                </div>
+                <span className="text-lg font-bold text-[#9747FF]">Read Aloud</span>
+              </button>
+
+              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+                <ReactMarkdown>{summaryCardContent}</ReactMarkdown>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-3xl">
+              <button
+                onClick={() => setSummaryCardContent(null)}
+                className="w-full py-4 bg-[#9747FF] text-white text-lg font-bold rounded-2xl shadow-lg hover:bg-[#863ee0] transition-all active:scale-95"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
