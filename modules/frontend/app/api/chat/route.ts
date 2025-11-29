@@ -108,7 +108,7 @@ You must output the content of each step following this exact structure, with no
 **END OF MANUAL:**
 - If there are no more steps in this section:
 - **Say:** 'That was the last step. You have completed this task.'
-- **REQUIRED TAG:** \`||SUGGEST: Finish Guide, Ask another question||\` (This enables the Exit button).
+- **REQUIRED TAG:** \`||SUGGEST: Finish Guide, Ask another question|| ||FINAL_STEP_DONE||\` (This enables the Exit button).
 
 **INSTRUCTION PROTOCOL:**
 When asked about a cleaning task (Tools, Chemicals, Cloths, etc.):

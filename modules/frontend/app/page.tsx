@@ -628,7 +628,20 @@ export default function MainChatScreen() {
         const optionsString = suggestMatch[1];
         newSuggestions = optionsString.split(",").map((s: string) => s.trim());
         // Remove the tag from the text shown to user
-        cleanContent = rawContent.replace(/\|\|SUGGEST:.*?\|\|/g, "").trim();
+        cleanContent = cleanContent.replace(/\|\|SUGGEST:.*?\|\|/g, "").trim();
+      }
+
+      // 2.5. Enforce Final Closure Logic (FIX)
+      if (rawContent.includes("||FINAL_STEP_DONE||")) {
+        // Remove the tag
+        cleanContent = cleanContent.replace("||FINAL_STEP_DONE||", "").trim();
+        
+        // Filter suggestions: Keep ONLY "Finish Guide" and "Ask another question" (or translations)
+        // We remove the known "Loop" buttons like "Done (Next step)", "Repeat", "Show me again"
+        newSuggestions = newSuggestions.filter(s => {
+          const lower = s.toLowerCase();
+          return !lower.includes("next") && !lower.includes("repeat") && !lower.includes("show me");
+        });
       }
 
       // 3. Extract Image Tags (NEW: Instruction Mode)
