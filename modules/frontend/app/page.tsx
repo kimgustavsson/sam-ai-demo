@@ -18,9 +18,206 @@ interface Message {
   image?: string;
 }
 
+const TRANSLATIONS = {
+  English: {
+    greeting: "How can I help you today?",
+    btn_questions: "Questions",
+    btn_instructions: "Instruction Files",
+    tab_home: "Home",
+    tab_history: "My Requests",
+    tab_settings: "Settings",
+    header_common: "Common questions",
+    header_workplace_guide: "Workplace Guide",
+    header_select_problem: "Select a problem",
+    header_accessibility: "Accessibility Settings",
+    header_review: "Review your Report",
+    header_security: "Security Notified!",
+    label_name: "Name",
+    label_type: "Type",
+    label_details: "Details",
+    label_text_size: "Text Size",
+    label_language: "Language",
+    btn_close: "Close",
+    btn_back: "Back",
+    btn_back_home: "Back to Home",
+    btn_send_manager: "Send to Manager",
+    btn_accept: "Accept",
+    btn_pick_time: "Pick another time",
+    status_thinking: "Thinking...",
+    status_listening: "Listening...",
+    status_in_progress: "In Progress",
+    status_finished: "Finished",
+    input_placeholder: "Ask me about anything",
+    footer_run_by: "Run by",
+    success_manager: "Sent to Manager! Get well soon.",
+    success_late: "Logged Successfully! Get here safely.",
+    security_msg: "Please proceed to the front desk.",
+    instr_tool_title: "Cleaning Tools",
+    instr_tool_text: "Red cloth = Toilets.\nBlue cloth = Desks.",
+    instr_safety_title: "Safety Rules",
+    instr_safety_text: "Wet floor sign must be visible.",
+    instr_waste_title: "Waste Sorting",
+    instr_waste_text: "Black bag = General.\nGreen bag = Food.",
+    instr_emergency_title: "Emergency",
+    instr_emergency_text: "Call 112.\nMeeting: Main Entrance.",
+    chip_sick: "Sick leave",
+    chip_late: "Late to work",
+    chip_problem: "Report a problem",
+    chip_upload: "Upload doctor's note",
+    chip_forgot: "Forgot a key/card",
+    chip_assist: "Need assistance",
+    chip_call: "Call my manager",
+    ai_recommendation: "AI Recommendation",
+    setting_vision: "Vision",
+    setting_vision_desc: "Large text, High contrast, audio",
+    setting_hearing: "Hearing",
+    setting_hearing_desc: "Vibrations, Visual alerts",
+    setting_motor: "Motor",
+    setting_motor_desc: "Voice control, large buttons",
+    setting_cognitive: "Cognitive",
+    setting_cognitive_desc: "Simple language, fewer choices",
+    setting_color: "Color Vision",
+    setting_color_desc: "High contrast, no red/green",
+    setting_standard: "Standard",
+    setting_standard_desc: "Default settings",
+    btn_submit_done: "I am done (Submit)",
+    btn_ask_more: "Ask More Questions"
+  },
+  Swedish: {
+    greeting: "Hur kan jag hjälpa dig idag?",
+    btn_questions: "Frågor",
+    btn_instructions: "Instruktioner",
+    tab_home: "Hem",
+    tab_history: "Mina Ärenden",
+    tab_settings: "Inställningar",
+    header_common: "Vanliga frågor",
+    header_workplace_guide: "Arbetsplatsguide",
+    header_select_problem: "Välj ett problem",
+    header_accessibility: "Tillgänglighetsinställningar",
+    header_review: "Granska din rapport",
+    header_security: "Säkerhetsvakt meddelad!",
+    label_name: "Namn",
+    label_type: "Typ",
+    label_details: "Detaljer",
+    label_text_size: "Textstorlek",
+    label_language: "Språk",
+    btn_close: "Stäng",
+    btn_back: "Tillbaka",
+    btn_back_home: "Tillbaka till Hem",
+    btn_send_manager: "Skicka till chefen",
+    btn_accept: "Acceptera",
+    btn_pick_time: "Välj en annan tid",
+    status_thinking: "Tänker...",
+    status_listening: "Lyssnar...",
+    status_in_progress: "Pågående",
+    status_finished: "Avslutat",
+    input_placeholder: "Fråga mig om vad som helst",
+    footer_run_by: "Drivs av",
+    success_manager: "Skickat till chefen! Krya på dig.",
+    success_late: "Loggat! Ta dig hit säkert.",
+    security_msg: "Vänligen gå till receptionen.",
+    instr_tool_title: "Städverktyg",
+    instr_tool_text: "Röd trasa = Toaletter.\nBlå trasa = Skrivbord.",
+    instr_safety_title: "Säkerhetsregler",
+    instr_safety_text: "Skylt för halt golv måste synas.",
+    instr_waste_title: "Sopsortering",
+    instr_waste_text: "Svart påse = Allmänt.\nGrön påse = Mat.",
+    instr_emergency_title: "Nödsituation",
+    instr_emergency_text: "Ring 112.\nSamlingsplats: Huvudentrén.",
+    chip_sick: "Sjukfrånvaro",
+    chip_late: "Sen ankomst",
+    chip_problem: "Rapportera problem",
+    chip_upload: "Ladda upp läkarintyg",
+    chip_forgot: "Glömt nyckel/kort",
+    chip_assist: "Behöver hjälp",
+    chip_call: "Ring min chef",
+    ai_recommendation: "AI Rekommendation",
+    setting_vision: "Syn",
+    setting_vision_desc: "Stor text, Hög kontrast, ljud",
+    setting_hearing: "Hörsel",
+    setting_hearing_desc: "Vibrationer, Visuella varningar",
+    setting_motor: "Motorik",
+    setting_motor_desc: "Röststyrning, stora knappar",
+    setting_cognitive: "Kognitiv",
+    setting_cognitive_desc: "Enkelt språk, färre val",
+    setting_color: "Färgseende",
+    setting_color_desc: "Hög kontrast, inget rött/grönt",
+    setting_standard: "Standard",
+    setting_standard_desc: "Standardinställningar",
+    btn_submit_done: "Jag är klar (Skicka)",
+    btn_ask_more: "Ställ fler frågor"
+  },
+  Arabic: {
+    greeting: "كيف يمكنني مساعدتك اليوم؟",
+    btn_questions: "أسئلة",
+    btn_instructions: "ملفات التعليمات",
+    tab_home: "الرئيسية",
+    tab_history: "طلباتي",
+    tab_settings: "الإعدادات",
+    header_common: "الأسئلة الشائعة",
+    header_workplace_guide: "دليل العمل",
+    header_select_problem: "حدد مشكلة",
+    header_accessibility: "إعدادات الوصول",
+    header_review: "مراجعة تقريرك",
+    header_security: "تم إبلاغ الأمن!",
+    label_name: "الاسم",
+    label_type: "النوع",
+    label_details: "التفاصيل",
+    label_text_size: "حجم النص",
+    label_language: "اللغة",
+    btn_close: "إغلاق",
+    btn_back: "رجوع",
+    btn_back_home: "العودة للرئيسية",
+    btn_send_manager: "إرسال للمدير",
+    btn_accept: "قبول",
+    btn_pick_time: "اختر وقتاً آخر",
+    status_thinking: "يفكر...",
+    status_listening: "يستمع...",
+    status_in_progress: "قيد المعالجة",
+    status_finished: "منتهي",
+    input_placeholder: "اسألني عن أي شيء",
+    footer_run_by: "مشغل بواسطة",
+    success_manager: "تم الإرسال للمدير! أتمنى لك الشفاء.",
+    success_late: "تم التسجيل! طريباً.",
+    security_msg: "يرجى التوجه للاستقبال.",
+    instr_tool_title: "أدوات التنظيف",
+    instr_tool_text: "قماش أحمر = دورات مياه.\nقماش أزرق = مكاتب.",
+    instr_safety_title: "قواعد السلامة",
+    instr_safety_text: "يجب وضع علامة أرضية مبللة.",
+    instr_waste_title: "فرز النفايات",
+    instr_waste_text: "كيس أسود = عام.\nكيس أخضر = طعام.",
+    instr_emergency_title: "طوارئ",
+    instr_emergency_text: "اتصل بـ 112.\nالتجمع: المدخل الرئيسي.",
+    chip_sick: "إجازة مرضية",
+    chip_late: "تأخر عن العمل",
+    chip_problem: "إبلاغ عن مشكلة",
+    chip_upload: "رفع تقرير طبي",
+    chip_forgot: "نسيت مفتاح/بطاقة",
+    chip_assist: "بحاجة لمساعدة",
+    chip_call: "الاتصال بمديري",
+    ai_recommendation: "توصية الذكاء الاصطناعي",
+    setting_vision: "الرؤية",
+    setting_vision_desc: "نص كبير، تباين عالي، صوت",
+    setting_hearing: "السمع",
+    setting_hearing_desc: "اهتزازات، تنبيهات بصرية",
+    setting_motor: "حركي",
+    setting_motor_desc: "تحكم صوتي، أزرار كبيرة",
+    setting_cognitive: "إدراكي",
+    setting_cognitive_desc: "لغة بسيطة، خيارات أقل",
+    setting_color: "رؤية الألوان",
+    setting_color_desc: "تباين عالي، لا أحمر/أخضر",
+    setting_standard: "قياسي",
+    setting_standard_desc: "الإعدادات الافتراضية",
+    btn_submit_done: "أنا انتهيت (إرسال)",
+    btn_ask_more: "طرح المزيد من الأسئلة"
+  }
+};
+
 export default function MainChatScreen() {
   // Helper state for navigation
   const [currentTab, setCurrentTab] = useState<'home' | 'history' | 'settings'>('home');
+  const [language, setLanguage] = useState<'English' | 'Swedish' | 'Arabic'>('English');
+  const t = TRANSLATIONS[language];
 
   // Chat State
   const [messages, setMessages] = useState<Message[]>([]);
@@ -341,23 +538,23 @@ export default function MainChatScreen() {
         return (
             <div className="w-full flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-4">
                 <div className="w-full bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                  <h2 className="font-display text-2xl font-semibold text-gray-800 mb-4">Review your Report</h2>
+                  <h2 className="font-display text-2xl font-semibold text-gray-800 mb-4">{t.header_review}</h2>
                   
                   <div className="space-y-4">
                     <div>
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Name</label>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t.label_name}</label>
                         <div className="text-lg font-medium text-gray-800">Fatima</div>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Type</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t.label_type}</label>
                       <div className="text-lg font-medium text-gray-800">
                         {reportType === 'Late Arrival' ? 'Late Arrival' : 'Sick Leave'}
                       </div>
                     </div>
                     
                     <div>
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Details</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t.label_details}</label>
                       <p className="text-base text-gray-600 mt-1 bg-gray-50 p-3 rounded-xl">
                         {reportType === 'Late Arrival' 
                             ? `Arriving in ${arrivalEstimate.match(/\d$/) ? arrivalEstimate + ' mins' : arrivalEstimate}`
@@ -387,7 +584,7 @@ export default function MainChatScreen() {
                       }}
                       className="w-full bg-primary text-white text-lg font-semibold py-4 rounded-2xl shadow-lg hover:bg-primary/90 transition-all active:scale-95"
                     >
-                      Send to Manager
+                      {t.btn_send_manager}
                     </button>
                   </div>
                 </div>
@@ -403,29 +600,29 @@ export default function MainChatScreen() {
                     <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-2">
                       <CheckCircle className="w-12 h-12 text-green-600" />
                     </div>
-                    <h2 className="font-display text-3xl font-bold text-gray-800 text-center">Sent to Manager! Get well soon.</h2>
+                    <h2 className="font-display text-3xl font-bold text-gray-800 text-center">{t.success_manager}</h2>
                   </>
             ) : successType === 'late' ? (
                   <>
                     <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-2">
                       <CheckCircle className="w-12 h-12 text-green-600" />
                     </div>
-                    <h2 className="font-display text-3xl font-bold text-gray-800 text-center">Logged Successfully! Get here safely.</h2>
+                    <h2 className="font-display text-3xl font-bold text-gray-800 text-center">{t.success_late}</h2>
                   </>
                 ) : (
                   <>
                     <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-2">
                       <Shield className="w-12 h-12 text-blue-600" />
                     </div>
-                    <h2 className="font-display text-3xl font-bold text-gray-800 text-center">Security Notified!</h2>
-                    <p className="text-lg text-gray-600 text-center">Please proceed to the front desk.</p>
+                    <h2 className="font-display text-3xl font-bold text-gray-800 text-center">{t.header_security}</h2>
+                    <p className="text-lg text-gray-600 text-center">{t.security_msg}</p>
                   </>
                 )}
                 <button 
                   onClick={handleHomeClick}
                   className="mt-8 px-8 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-full hover:bg-gray-50 transition-all"
                 >
-                  Back to Home
+                  {t.btn_back_home}
                 </button>
             </div>
         );
@@ -440,7 +637,7 @@ export default function MainChatScreen() {
                     Hi, Fatima
                   </span>
                   <h1 className="font-display text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight">
-                    How can I help you today?
+                    {t.greeting}
                   </h1>
                 </div>
                 
@@ -455,7 +652,7 @@ export default function MainChatScreen() {
                       <div className="p-4 bg-purple-50 rounded-full mb-3">
                         <Pill className="w-8 h-8 text-primary" /> 
                       </div>
-                      <span className="text-lg font-medium text-gray-800">Questions</span>
+                      <span className="text-lg font-medium text-gray-800">{t.btn_questions}</span>
                     </button>
 
                     <button 
@@ -466,7 +663,7 @@ export default function MainChatScreen() {
                       <div className="p-4 bg-purple-50 rounded-full mb-3">
                         <FileText className="w-8 h-8 text-primary" />
                       </div>
-                      <span className="text-lg font-medium text-gray-800">Instruction Files</span>
+                      <span className="text-lg font-medium text-gray-800">{t.btn_instructions}</span>
                     </button>
                   </div>
                 )}
@@ -474,20 +671,20 @@ export default function MainChatScreen() {
                 {viewState === 'instructions' && (
                    <div className="w-full flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div className="flex items-center justify-between px-2">
-                      <h3 className="font-display text-lg font-semibold text-gray-800">Workplace Guide</h3>
+                      <h3 className="font-display text-lg font-semibold text-gray-800">{t.header_workplace_guide}</h3>
                       <button 
                         onClick={() => setViewState('main')}
                         className="text-sm text-primary font-medium hover:text-primary/80"
                       >
-                        Back
+                        {t.btn_back}
                       </button>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         {[
-                            { id: 'tool', icon: Brush, title: 'Cleaning Tools', text: 'Red cloth = Toilets.\nBlue cloth = Desks.', color: 'bg-blue-100' },
-                            { id: 'safety', icon: TriangleAlert, title: 'Safety Rules', text: 'Wet floor sign must be visible.', color: 'bg-yellow-100' },
-                            { id: 'waste', icon: Trash2, title: 'Waste Sorting', text: 'Black bag = General.\nGreen bag = Food.', color: 'bg-green-100' },
-                            { id: 'emergency', icon: Siren, title: 'Emergency', text: 'Call 112.\nMeeting: Main Entrance.', color: 'bg-red-100' },
+                            { id: 'tool', icon: Brush, title: t.instr_tool_title, text: t.instr_tool_text, color: 'bg-blue-100' },
+                            { id: 'safety', icon: TriangleAlert, title: t.instr_safety_title, text: t.instr_safety_text, color: 'bg-yellow-100' },
+                            { id: 'waste', icon: Trash2, title: t.instr_waste_title, text: t.instr_waste_text, color: 'bg-green-100' },
+                            { id: 'emergency', icon: Siren, title: t.instr_emergency_title, text: t.instr_emergency_text, color: 'bg-red-100' },
                         ].map(item => (
                             <button
                                 key={item.id}
@@ -509,12 +706,12 @@ export default function MainChatScreen() {
                 {viewState === 'questions' && (
                   <div className="w-full flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div className="flex items-center justify-between px-2">
-                      <h3 className="font-display text-lg font-semibold text-gray-800">Common questions</h3>
+                      <h3 className="font-display text-lg font-semibold text-gray-800">{t.header_common}</h3>
                       <button 
                         onClick={() => setViewState('main')}
                         className="text-sm text-primary font-medium hover:text-primary/80"
                       >
-                        Close
+                        {t.btn_close}
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -526,28 +723,28 @@ export default function MainChatScreen() {
                         }}
                         className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
                       >
-                        Sick leave
+                        {t.chip_sick}
                       </button>
 
                       <button
                         onClick={handleLateToWork}
                         className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
                       >
-                        Late to work
+                        {t.chip_late}
                       </button>
 
                       <button
                         onClick={handleReportProblem}
                         className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
                       >
-                        Have a problem
+                        {t.chip_problem}
                       </button>
 
                       <button
                         onClick={handleUploadNote}
                         className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
                       >
-                        Upload doctor's note
+                        {t.chip_upload}
                       </button>
                     </div>
                   </div>
@@ -556,12 +753,12 @@ export default function MainChatScreen() {
                 {viewState === 'problems' && (
                    <div className="w-full flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div className="flex items-center justify-between px-2">
-                      <h3 className="font-display text-lg font-semibold text-gray-800">Select a problem</h3>
+                      <h3 className="font-display text-lg font-semibold text-gray-800">{t.header_select_problem}</h3>
                       <button 
                         onClick={() => setViewState('main')}
                         className="text-sm text-primary font-medium hover:text-primary/80"
                       >
-                        Close
+                        {t.btn_close}
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -569,14 +766,14 @@ export default function MainChatScreen() {
                         onClick={handleForgotKey}
                         className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
                       >
-                        Forgot a key/card
+                        {t.chip_forgot}
                       </button>
 
                       <button
                         onClick={handleNeedAssistance}
                         className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
                       >
-                        Need assistance
+                        {t.chip_assist}
                       </button>
 
                       <button
@@ -586,7 +783,7 @@ export default function MainChatScreen() {
                         }}
                         className="px-4 py-2 bg-white border border-purple-100 text-primary rounded-full font-medium shadow-sm hover:bg-purple-50 active:scale-95 transition-all text-left"
                       >
-                        Call my manager
+                        {t.chip_call}
                       </button>
                     </div>
                   </div>
@@ -626,7 +823,7 @@ export default function MainChatScreen() {
                             <div className="mt-3 bg-purple-50 border border-purple-200 rounded-xl p-4">
                                 <div className="flex items-center space-x-2 mb-2">
                                     <Sparkles className="w-4 h-4 text-primary" />
-                                    <span className="text-xs font-bold text-primary uppercase tracking-wide">AI Recommendation</span>
+                                    <span className="text-xs font-bold text-primary uppercase tracking-wide">{t.ai_recommendation}</span>
                                 </div>
                                 <div className="text-2xl font-bold text-gray-900">{legacySuggestion[0]}</div>
                                 <div className="text-sm text-gray-500 mb-4">{legacySuggestion[1]}</div>
@@ -639,13 +836,13 @@ export default function MainChatScreen() {
                                         }}
                                         className="w-full py-3 bg-primary text-white font-semibold rounded-lg shadow-sm hover:bg-primary/90 transition-all"
                                     >
-                                        Accept {legacySuggestion[0]}
+                                        {t.btn_accept} {legacySuggestion[0]}
                                     </button>
                                     <button 
                                         onClick={() => handleSend("I need a different time.")}
                                         className="w-full py-3 bg-white text-gray-600 font-medium border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
                                     >
-                                        Pick another time
+                                        {t.btn_pick_time}
                                     </button>
                                 </div>
                             </div>
@@ -662,7 +859,7 @@ export default function MainChatScreen() {
                     className="w-full bg-[#9747FF] text-white text-lg font-semibold py-4 rounded-2xl shadow-lg hover:bg-[#863ee0] transition-all active:scale-95 flex items-center justify-center space-x-2"
                   >
                     <Home className="w-5 h-5" />
-                    <span>Back to Home</span>
+                    <span>{t.btn_back_home}</span>
                   </button>
                </div>
             )}
@@ -670,7 +867,7 @@ export default function MainChatScreen() {
             {isLoading && (
                  <div className="flex justify-start">
                     <div className="max-w-[80%] p-4 rounded-2xl bg-white text-gray-500 shadow-md rounded-bl-none animate-pulse">
-                        Thinking...
+                        {t.status_thinking}
                     </div>
                  </div>
             )}
@@ -681,10 +878,10 @@ export default function MainChatScreen() {
 
   const renderHistory = () => (
       <div className="w-full flex flex-col space-y-6 h-full">
-         <h2 className="font-display text-2xl font-semibold text-gray-800 pl-2 mb-2">My Requests</h2>
+         <h2 className="font-display text-2xl font-semibold text-gray-800 pl-2 mb-2">{t.tab_history}</h2>
          
          <div className="flex flex-col space-y-3">
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider pl-2">In Progress</h3>
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider pl-2">{t.status_in_progress}</h3>
             {historyItems.filter(i => i.status === 'Sent' || i.status === 'Reviewing').map((item, idx) => (
                 <div key={idx} className="p-4 bg-white rounded-xl shadow-md flex justify-between items-center animate-in slide-in-from-bottom-2 duration-300">
                     <div>
@@ -699,7 +896,7 @@ export default function MainChatScreen() {
          </div>
 
          <div className="flex flex-col space-y-3 mt-4">
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider pl-2">Finished</h3>
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider pl-2">{t.status_finished}</h3>
             {historyItems.filter(i => i.status === 'Done').map((item, idx) => (
                 <div key={idx} className="p-4 bg-gray-50 rounded-xl flex justify-between items-center animate-in slide-in-from-bottom-2 duration-300">
                     <div>
@@ -724,17 +921,17 @@ export default function MainChatScreen() {
             >
                 <ArrowLeft className="w-6 h-6 text-gray-700" />
             </button>
-            <h2 className="font-display flex-1 text-xl font-semibold text-gray-800 text-center mr-10">Accessibility Settings</h2>
+            <h2 className="font-display flex-1 text-xl font-semibold text-gray-800 text-center mr-10">{t.header_accessibility}</h2>
         </div>
         
         <div className="grid grid-cols-2 gap-4 px-1">
             {[
-                { id: 'Vision', icon: Eye, label: 'Vision', desc: 'Large text, High contrast, audio' },
-                { id: 'Hearing', icon: Ear, label: 'Hearing', desc: 'Vibrations, Visual alerts' },
-                { id: 'Motor', icon: Hand, label: 'Motor', desc: 'Voice control, large buttons' },
-                { id: 'Cognitive', icon: Brain, label: 'Cognitive', desc: 'Simple language, fewer choices' },
-                { id: 'Color Vision', icon: Palette, label: 'Color Vision', desc: 'High contrast, no red/green' },
-                { id: 'Standard', icon: SettingsIcon, label: 'Standard', desc: 'Default settings' },
+                { id: 'Vision', icon: Eye, label: t.setting_vision, desc: t.setting_vision_desc },
+                { id: 'Hearing', icon: Ear, label: t.setting_hearing, desc: t.setting_hearing_desc },
+                { id: 'Motor', icon: Hand, label: t.setting_motor, desc: t.setting_motor_desc },
+                { id: 'Cognitive', icon: Brain, label: t.setting_cognitive, desc: t.setting_cognitive_desc },
+                { id: 'Color Vision', icon: Palette, label: t.setting_color, desc: t.setting_color_desc },
+                { id: 'Standard', icon: SettingsIcon, label: t.setting_standard, desc: t.setting_standard_desc },
             ].map((mode) => {
                 const isActive = selectedMode === mode.id;
                 const Icon = mode.icon;
@@ -767,10 +964,11 @@ export default function MainChatScreen() {
 
         {/* Language Selector */}
         <div className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
-            <span className="font-bold text-gray-800 text-lg">Language</span>
+            <span className="font-bold text-gray-800 text-lg">{t.label_language}</span>
             <select 
                 className="bg-gray-50 border border-gray-300 text-gray-800 text-base rounded-lg focus:ring-primary focus:border-primary block p-2.5 min-w-[120px]"
-                defaultValue="English"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as any)}
             >
                 <option value="English">English</option>
                 <option value="Swedish">Swedish</option>
@@ -862,19 +1060,19 @@ export default function MainChatScreen() {
                         <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
                         <button onClick={cancelUpload} className="absolute top-2 right-2 p-1 bg-black/50 text-white rounded-full hover:bg-black/70"><X className="w-4 h-4" /></button>
                     </div>
-                    <button onClick={handleUploadConfirm} className="w-full bg-primary text-white font-semibold py-3 rounded-xl shadow-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center space-x-2"><Upload className="w-5 h-5" /><span>Upload Doctor's Note</span></button>
+                    <button onClick={handleUploadConfirm} className="w-full bg-primary text-white font-semibold py-3 rounded-xl shadow-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center space-x-2"><Upload className="w-5 h-5" /><span>{t.chip_upload}</span></button>
                 </div>
             )}
 
             {/* Decision or Input */}
             {ticketState === 'decision' ? (
                 <div className="w-full flex flex-col space-y-3 animate-in slide-in-from-bottom-10 duration-300">
-                    <button onClick={() => setTicketState('summary')} className="w-full bg-primary text-white text-lg font-semibold py-3 rounded-2xl shadow-lg hover:bg-primary/90 active:scale-95 transition-all">I am done (Submit)</button>
-                    <button onClick={() => setTicketState('chat')} className="w-full bg-white text-primary text-lg font-semibold py-3 rounded-2xl border-2 border-purple-100 hover:bg-purple-50 active:scale-95 transition-all">Ask More Questions</button>
+                    <button onClick={() => setTicketState('summary')} className="w-full bg-primary text-white text-lg font-semibold py-3 rounded-2xl shadow-lg hover:bg-primary/90 active:scale-95 transition-all">{t.btn_submit_done}</button>
+                    <button onClick={() => setTicketState('chat')} className="w-full bg-white text-primary text-lg font-semibold py-3 rounded-2xl border-2 border-purple-100 hover:bg-purple-50 active:scale-95 transition-all">{t.btn_ask_more}</button>
                 </div>
             ) : (
                 <div className="relative w-full flex items-center bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 p-2 pl-6">
-                    <input type="text" placeholder="Ask me about anything" className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-base" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} />
+                    <input type="text" placeholder={t.input_placeholder} className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-base" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} />
                     <div className="flex items-center space-x-2">
                         <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors" onClick={handleUploadNote}><ImageIcon className="w-5 h-5" /></button>
                         <button className={`p-2 transition-colors ${isListening ? 'text-[#9747FF] animate-pulse' : 'text-gray-400 hover:text-gray-600'}`} onClick={() => {setShowVoiceOverlay(true); if (!isListening) toggleListening();}}><Mic className={`w-5 h-5 ${isListening ? 'fill-current' : ''}`} /></button>
@@ -885,7 +1083,7 @@ export default function MainChatScreen() {
 
             {/* Branding */}
             <div className="text-center mt-2">
-                <span className="text-[10px] text-gray-400 font-medium">Run by <strong>Anduril 1.0 version</strong></span>
+                <span className="text-[10px] text-gray-400 font-medium">{t.footer_run_by} <strong>Anduril 1.0 version</strong></span>
             </div>
           </div>
         </div>
@@ -894,9 +1092,9 @@ export default function MainChatScreen() {
       {/* 3. Fixed Bottom Navigation */}
       <div className="flex-none z-50 absolute bottom-0 left-0 w-full">
           <nav className="w-full bg-white border-t border-gray-100 flex justify-around items-center py-3 pt-4 pb-6 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-            <button onClick={handleHomeClick} className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'home' ? 'text-primary' : 'text-gray-500 hover:text-gray-600'}`}><Home className="w-7 h-7" /><span className="text-xs font-medium">Home</span></button>
-            <button onClick={() => setCurrentTab('history')} className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'history' ? 'text-primary' : 'text-gray-500 hover:text-gray-600'}`}><ClipboardList className="w-7 h-7" /><span className="text-xs font-medium">History</span></button>
-            <button onClick={() => setCurrentTab('settings')} className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'settings' ? 'text-primary' : 'text-gray-500 hover:text-gray-600'}`}><PersonStanding className="w-7 h-7" /><span className="text-xs font-medium">Settings</span></button>
+            <button onClick={handleHomeClick} className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'home' ? 'text-primary' : 'text-gray-500 hover:text-gray-600'}`}><Home className="w-7 h-7" /><span className="text-xs font-medium">{t.tab_home}</span></button>
+            <button onClick={() => setCurrentTab('history')} className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'history' ? 'text-primary' : 'text-gray-500 hover:text-gray-600'}`}><ClipboardList className="w-7 h-7" /><span className="text-xs font-medium">{t.tab_history}</span></button>
+            <button onClick={() => setCurrentTab('settings')} className={`flex flex-col items-center space-y-1 w-16 transition-colors ${currentTab === 'settings' ? 'text-primary' : 'text-gray-500 hover:text-gray-600'}`}><PersonStanding className="w-7 h-7" /><span className="text-xs font-medium">{t.tab_settings}</span></button>
           </nav>
       </div>
 
@@ -906,7 +1104,7 @@ export default function MainChatScreen() {
                   <h3 className="font-display text-2xl font-bold text-center text-gray-800 mb-6">{activeInstruction.title}</h3>
                   <div className={`w-full h-40 rounded-2xl mb-6 ${activeInstruction.color} border-2 border-gray-100 flex items-center justify-center`}><div className="w-16 h-16 bg-white/50 rounded-full" /></div>
                   <p className="text-lg text-center text-gray-700 font-medium mb-8 whitespace-pre-line">{activeInstruction.text}</p>
-                  <button onClick={() => setActiveInstruction(null)} className="w-full py-3 bg-[#9747FF] text-white font-bold rounded-xl shadow-md hover:bg-[#863ee0] transition-all">Close</button>
+                  <button onClick={() => setActiveInstruction(null)} className="w-full py-3 bg-[#9747FF] text-white font-bold rounded-xl shadow-md hover:bg-[#863ee0] transition-all">{t.btn_close}</button>
               </div>
           </div>
       )}
@@ -915,7 +1113,7 @@ export default function MainChatScreen() {
         <>
              <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={() => setShowVoiceOverlay(false)} />
              <div className="fixed bottom-0 left-0 right-0 h-1/2 bg-white rounded-t-3xl shadow-2xl z-50 flex flex-col items-center justify-between py-12 animate-in slide-in-from-bottom duration-300 max-w-lg mx-auto">
-                <span className="text-gray-500 font-medium text-lg animate-pulse">Listening...</span>
+                <span className="text-gray-500 font-medium text-lg animate-pulse">{t.status_listening}</span>
                 <div className="relative"><div className="w-24 h-24 rounded-full bg-[#9747FF]/10 flex items-center justify-center mb-4"><Mic className="w-10 h-10 text-[#9747FF]" /></div></div>
                 <div className="flex items-center justify-center space-x-1 h-16 mb-8">{[...Array(7)].map((_, i) => (<div key={i} className="w-2 bg-[#9747FF] rounded-full animate-wave" style={{animationDuration: `${0.6 + Math.random() * 0.4}s`, animationDelay: `${(i * 0.1) - 0.2}s`}} />))}</div>
                 <div className="flex items-center w-full justify-between px-16">
