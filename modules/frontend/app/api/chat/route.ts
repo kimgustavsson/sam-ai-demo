@@ -65,7 +65,17 @@ Whenever you ask a question, you **MUST** provide clickable options using this t
 1. User: "I am late."
 2. AI: "Drive safely. When will you arrive? ||SUGGEST: 10 mins, 30 mins, 1 hour||"
 3. User: "30 mins."
-4. AI: "Got it. I told the manager **30 mins**. Are you done? ||SUGGEST: I am done (Send now), I have more questions||"`
+4. AI: "Got it. I told the manager **30 mins**. Are you done? ||SUGGEST: I am done (Send now), I have more questions||"
+
+**System Prompt Closure Rule:**
+When the user confirms completion (e.g., clicks 'I am done', says 'finished', or 'send it'):
+1. Respond with the success message.
+2. **YOU MUST APPEND A COMMIT TAG:** 
+   - If Sick Leave: \`||COMMIT:SICK||\`
+   - If Late: \`||COMMIT:LATE||\`
+   - If Info/Instruction: \`||COMMIT:INFO||\`
+   - *Example:* 'Manager notified. ||COMMIT:SICK|| ||SUGGEST: ...||'
+`
         },
         ...messages,
       ],

@@ -81,7 +81,14 @@ const TRANSLATIONS = {
     setting_standard: "Standard",
     setting_standard_desc: "Default settings",
     btn_submit_done: "I am done (Submit)",
-    btn_ask_more: "Ask More Questions"
+    btn_ask_more: "Ask More Questions",
+    ticket_sick: "Sick Leave",
+    ticket_late: "Late Arrival",
+    ticket_it: "IT Support",
+    ticket_key: "Lost Key",
+    status_sent: "Sent",
+    status_review: "Reviewing",
+    status_done: "Done"
   },
   Swedish: {
     greeting: "Hur kan jag hjälpa dig idag?",
@@ -145,7 +152,14 @@ const TRANSLATIONS = {
     setting_standard: "Standard",
     setting_standard_desc: "Standardinställningar",
     btn_submit_done: "Jag är klar (Skicka)",
-    btn_ask_more: "Ställ fler frågor"
+    btn_ask_more: "Ställ fler frågor",
+    ticket_sick: "Sjukfrånvaro",
+    ticket_late: "Sen Ankomst",
+    ticket_it: "IT-stöd",
+    ticket_key: "Förlorad Nyckel",
+    status_sent: "Skickad",
+    status_review: "Granskas",
+    status_done: "Klar"
   },
   Arabic: {
     greeting: "كيف يمكنني مساعدتك اليوم؟",
@@ -209,7 +223,14 @@ const TRANSLATIONS = {
     setting_standard: "قياسي",
     setting_standard_desc: "الإعدادات الافتراضية",
     btn_submit_done: "أنا انتهيت (إرسال)",
-    btn_ask_more: "طرح المزيد من الأسئلة"
+    btn_ask_more: "طرح المزيد من الأسئلة",
+    ticket_sick: "إجازة مرضية",
+    ticket_late: "تأخر عن العمل",
+    ticket_it: "دعم فني",
+    ticket_key: "مفتاح مفقود",
+    status_sent: "تم الإرسال",
+    status_review: "قيد المراجعة",
+    status_done: "تم"
   }
 };
 
@@ -240,15 +261,27 @@ export default function MainChatScreen() {
 
   // History State - "My Requests"
   const [historyItems, setHistoryItems] = useState([
-    { title: 'Sick Leave', date: 'Nov 27, 2025', status: 'Sent' },
-    { title: 'Late Arrival', date: 'Nov 20, 2025', status: 'Reviewing' },
-    { title: 'IT Issue', date: 'Nov 15, 2025', status: 'Done' },
-    { title: 'Lost Key', date: 'Nov 10, 2025', status: 'Done' }
+    { title: 'ticket_it', date: 'Nov 15, 2025', status: 'status_done' },
+    { title: 'ticket_key', date: 'Nov 10, 2025', status: 'status_done' }
   ]);
+
+  const addHistoryItem = (type: string) => {
+      let titleKey = 'ticket_sick';
+      if (type === 'LATE') titleKey = 'ticket_late';
+      if (type === 'INFO') titleKey = 'ticket_it'; 
+      
+      const newItem = {
+          title: titleKey,
+          date: 'Just now',
+          status: 'status_sent'
+      };
+      setHistoryItems(prev => [newItem, ...prev]);
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Settings State
   const [settings, setSettings] = useState({
@@ -263,6 +296,47 @@ export default function MainChatScreen() {
   const [textSizeMode, setTextSizeMode] = useState('Normal');
   const [showVoiceOverlay, setShowVoiceOverlay] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+
+  // TTS State & Helper
+  const [isTTSEnabled, setIsTTSEnabled] = useState(false);
+
+  const speak = (text: string) => {
+    if (!isTTSEnabled || typeof window === 'undefined' || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text.replace(/[*_#`]/g, ''));
+    
+    // 1. Determine Target Code
+    const targetLangCode = language === 'Swedish' ? 'sv' : (language === 'Arabic' ? 'ar' : 'en');
+    
+    // 2. Find Best Voice
+    const voices = window.speechSynthesis.getVoices();
+    const nativeVoice = voices.find(v => v.lang.startsWith(targetLangCode));
+    
+    // 3. Apply Voice & Lang
+    if (nativeVoice) utterance.voice = nativeVoice;
+    utterance.lang = targetLangCode;
+    utterance.rate = 0.9; 
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Ensure voices are loaded
+  useEffect(() => {
+     if (typeof window !== 'undefined' && window.speechSynthesis) {
+         window.speechSynthesis.getVoices();
+     }
+  }, []);
+
+  // TTS Effect for new AI messages
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg.role === 'assistant' || lastMsg.role === 'system') {
+          speak(lastMsg.content);
+      }
+    }
+  }, [messages]);
 
   const toggleSetting = (key: keyof typeof settings) => {
     setSettings(prev => ({ ...prev, [key]: !prev[key] }));
@@ -339,6 +413,18 @@ export default function MainChatScreen() {
 
   const handleSend = async (messageText?: string) => {
     const textToSend = messageText || input;
+
+    // Special handling for "Ask More Questions" or "I have more questions"
+    if (textToSend === "I have more questions" || textToSend === t.btn_ask_more) {
+        setCurrentSuggestions([]);
+        setTicketState('chat');
+        setMessages(prev => [...prev, { role: 'assistant', content: "Okay, what else can I help with?" }]);
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 100);
+        return;
+    }
+
     if (!textToSend.trim() || isLoading) return;
 
     // Capture Late Arrival Time logic
@@ -369,7 +455,15 @@ export default function MainChatScreen() {
       let cleanContent = rawContent;
       let newSuggestions: string[] = [];
 
-      // 1. Extract Suggestions using Regex (Robust)
+      // 1. Extract Commit Tags
+      const commitMatch = rawContent.match(/\|\|COMMIT:(.*?)\|\|/);
+      if (commitMatch) {
+          const commitType = commitMatch[1];
+          addHistoryItem(commitType);
+          cleanContent = cleanContent.replace(/\|\|COMMIT:.*?\|\|/g, '').trim();
+      }
+
+      // 2. Extract Suggestions using Regex (Robust)
       const suggestMatch = rawContent.match(/\|\|SUGGEST:(.*?)\|\|/);
       if (suggestMatch) {
           const optionsString = suggestMatch[1];
@@ -417,12 +511,14 @@ export default function MainChatScreen() {
   };
 
   const handleLateToWork = () => {
+    speak("Late to work selected");
     setReportType('Late Arrival');
     handleSend("I am late to work");
     setViewState('main');
   };
 
   const handleCleaningTools = () => {
+      speak("Cleaning tools selected");
       setViewState('main');
       setMessages(prev => [...prev, { role: 'user', content: "Where are the cleaning tools?" }]);
       
@@ -448,6 +544,7 @@ export default function MainChatScreen() {
   };
 
   const handleForgotKey = () => {
+    speak("Forgot key selected");
     setViewState('main');
     setActiveFlow('lost_key');
     setMessages(prev => [...prev, 
@@ -479,6 +576,7 @@ export default function MainChatScreen() {
   };
   
   const handleNeedAssistance = () => {
+    speak("Assistance selected");
     setViewState('main');
     setActiveFlow('call_manager');
     setMessages(prev => [...prev, 
@@ -568,9 +666,9 @@ export default function MainChatScreen() {
                     <button 
                       onClick={() => {
                         const newItem = {
-                            title: reportType === 'Late Arrival' ? 'Late Arrival' : 'Sick Leave',
+                            title: reportType === 'Late Arrival' ? 'ticket_late' : 'ticket_sick',
                             date: 'Just now',
-                            status: 'Sent'
+                            status: 'status_sent'
                         };
                         setHistoryItems(prev => [newItem, ...prev]);
                         // Logic Check
@@ -716,6 +814,7 @@ export default function MainChatScreen() {
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => {
+                          speak("Sick leave selected");
                           setReportType('Sick Leave');
                           handleSend("Sick leave");
                           setViewState('main');
@@ -876,9 +975,9 @@ export default function MainChatScreen() {
   };
 
   const renderHistory = () => {
-    const getTheme = (title: string) => {
-        if (title.includes('Sick')) return { border: 'border-l-4 border-emerald-500', badge: 'text-emerald-700 bg-emerald-50', icon: 'text-emerald-500' };
-        if (title.includes('Late')) return { border: 'border-l-4 border-pink-500', badge: 'text-pink-700 bg-pink-50', icon: 'text-pink-500' };
+    const getTheme = (titleKey: string) => {
+        if (titleKey === 'ticket_sick') return { border: 'border-l-4 border-emerald-500', badge: 'text-emerald-700 bg-emerald-50', icon: 'text-emerald-500' };
+        if (titleKey === 'ticket_late') return { border: 'border-l-4 border-pink-500', badge: 'text-pink-700 bg-pink-50', icon: 'text-pink-500' };
         return { border: 'border-l-4 border-blue-500', badge: 'text-blue-700 bg-blue-50', icon: 'text-blue-500' };
     };
 
@@ -888,16 +987,20 @@ export default function MainChatScreen() {
          
          <div className="flex flex-col space-y-3">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider pl-2">{t.status_in_progress}</h3>
-            {historyItems.filter(i => i.status === 'Sent' || i.status === 'Reviewing').map((item, idx) => {
+            {historyItems.filter(i => i.status === 'status_sent' || i.status === 'status_review').map((item, idx) => {
                 const theme = getTheme(item.title);
+                // Use type assertion to access translation keys safely if needed, or just use as any
+                const titleText = (t as any)[item.title] || item.title;
+                const statusText = (t as any)[item.status] || item.status;
+                
                 return (
                     <div key={idx} className={`p-4 bg-white rounded-xl shadow-md flex justify-between items-center animate-in slide-in-from-bottom-2 duration-300 ${theme.border}`}>
                         <div>
-                            <div className="font-bold text-gray-800 text-lg">{item.title}</div>
+                            <div className="font-bold text-gray-800 text-lg">{titleText}</div>
                             <div className="text-xs text-gray-400 font-medium">{item.date}</div>
                         </div>
                         <span className={`font-semibold px-3 py-1 rounded-full text-sm ${theme.badge}`}>
-                            {item.status}
+                            {statusText}
                         </span>
                     </div>
                 );
@@ -906,16 +1009,19 @@ export default function MainChatScreen() {
 
          <div className="flex flex-col space-y-3 mt-4">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider pl-2">{t.status_finished}</h3>
-            {historyItems.filter(i => i.status === 'Done').map((item, idx) => {
+            {historyItems.filter(i => i.status === 'status_done').map((item, idx) => {
                 const theme = getTheme(item.title);
+                const titleText = (t as any)[item.title] || item.title;
+                const statusText = (t as any)[item.status] || item.status;
+                
                 return (
                     <div key={idx} className={`p-4 bg-gray-50 rounded-xl flex justify-between items-center animate-in slide-in-from-bottom-2 duration-300 ${theme.border}`}>
                         <div>
-                            <div className="font-bold text-gray-600 text-lg">{item.title}</div>
+                            <div className="font-bold text-gray-600 text-lg">{titleText}</div>
                             <div className="text-xs text-gray-400 font-medium">{item.date}</div>
                         </div>
                         <span className={`font-semibold px-3 py-1 text-sm rounded-full ${theme.badge}`}>
-                            {item.status}
+                            {statusText}
                         </span>
                     </div>
                 );
@@ -946,7 +1052,7 @@ export default function MainChatScreen() {
                 { id: 'Color Vision', icon: Palette, label: t.setting_color, desc: t.setting_color_desc },
                 { id: 'Standard', icon: SettingsIcon, label: t.setting_standard, desc: t.setting_standard_desc },
             ].map((mode) => {
-                const isActive = selectedMode === mode.id;
+                const isActive = mode.id === 'Hearing' ? isTTSEnabled : selectedMode === mode.id;
                 const Icon = mode.icon;
                 
                 // Dynamic Font Sizes
@@ -956,7 +1062,19 @@ export default function MainChatScreen() {
                 return (
                     <button
                         key={mode.id}
-                        onClick={() => setSelectedMode(mode.id)}
+                        onClick={() => {
+                            if (mode.id === 'Hearing') {
+                                const newState = !isTTSEnabled;
+                                setIsTTSEnabled(newState);
+                                if (newState && typeof window !== 'undefined' && window.speechSynthesis) {
+                                    window.speechSynthesis.cancel();
+                                    const utterance = new SpeechSynthesisUtterance("Voice mode enabled");
+                                    utterance.lang = language === 'Swedish' ? 'sv-SE' : (language === 'Arabic' ? 'ar-SA' : 'en-US');
+                                    window.speechSynthesis.speak(utterance);
+                                }
+                            }
+                            setSelectedMode(mode.id);
+                        }}
                         className={`flex flex-col p-4 rounded-2xl text-left transition-all duration-300 border ${
                             isActive 
                             ? 'bg-[#9747FF] border-[#9747FF] text-white shadow-lg shadow-purple-500/30 scale-[1.02]' 
@@ -1081,11 +1199,19 @@ export default function MainChatScreen() {
             {ticketState === 'decision' ? (
                 <div className="w-full flex flex-col space-y-3 animate-in slide-in-from-bottom-10 duration-300">
                     <button onClick={() => setTicketState('summary')} className="w-full bg-primary text-white text-lg font-semibold py-3 rounded-2xl shadow-lg hover:bg-primary/90 active:scale-95 transition-all">{t.btn_submit_done}</button>
-                    <button onClick={() => setTicketState('chat')} className="w-full bg-white text-primary text-lg font-semibold py-3 rounded-2xl border-2 border-purple-100 hover:bg-purple-50 active:scale-95 transition-all">{t.btn_ask_more}</button>
+                    <button onClick={() => handleSend(t.btn_ask_more)} className="w-full bg-white text-primary text-lg font-semibold py-3 rounded-2xl border-2 border-purple-100 hover:bg-purple-50 active:scale-95 transition-all">{t.btn_ask_more}</button>
                 </div>
             ) : (
                 <div className="relative w-full flex items-center bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 p-2 pl-6">
-                    <input type="text" placeholder={t.input_placeholder} className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-base" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} />
+                    <input 
+                        ref={inputRef}
+                        type="text" 
+                        placeholder={t.input_placeholder} 
+                        className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-base" 
+                        value={input} 
+                        onChange={(e) => setInput(e.target.value)} 
+                        onKeyDown={handleKeyDown} 
+                    />
                     <div className="flex items-center space-x-2">
                         <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors" onClick={handleUploadNote}><ImageIcon className="w-5 h-5" /></button>
                         <button className={`p-2 transition-colors ${isListening ? 'text-[#9747FF] animate-pulse' : 'text-gray-400 hover:text-gray-600'}`} onClick={() => {setShowVoiceOverlay(true); if (!isListening) toggleListening();}}><Mic className={`w-5 h-5 ${isListening ? 'fill-current' : ''}`} /></button>
