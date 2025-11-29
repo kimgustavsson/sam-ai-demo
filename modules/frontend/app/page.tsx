@@ -296,7 +296,7 @@ export default function MainChatScreen() {
     "home"
   );
   const [language, setLanguage] = useState<"English" | "Swedish" | "Arabic">(
-    "English"
+    "English" // Default Language
   );
   const t = TRANSLATIONS[language];
 
