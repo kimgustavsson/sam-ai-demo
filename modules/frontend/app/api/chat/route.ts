@@ -18,6 +18,8 @@ export async function POST(req: Request) {
         trans_rule: "Respond in English.",
         btn_done: "I am done (Send now)",
         btn_more: "I have more questions",
+        btn_finish: "Finish Guide",
+        btn_ask_more: "Ask another question",
         sick_ack: "Oh no, please rest. Should I tell the manager you are taking **TODAY** off?",
         sick_opts: "Yes please, No - Tomorrow",
         sick_finish: "Okay. I sent the report. Rest well. Are you done?",
@@ -33,6 +35,8 @@ export async function POST(req: Request) {
         trans_rule: "VIKTIGT: Svara ENDAST på SVENSKA. Översätt allt innehåll.",
         btn_done: "Jag är klar (Skicka nu)",
         btn_more: "Jag har fler frågor",
+        btn_finish: "Avsluta guiden",
+        btn_ask_more: "Ställ en annan fråga",
         sick_ack: "Åh nej, vila upp dig. Ska jag meddela chefen att du är ledig **IDAG**?",
         sick_opts: "Ja tack, Nej - Imorgon",
         sick_finish: "Okej. Jag skickade rapporten. Krya på dig. Är du klar?",
@@ -48,6 +52,8 @@ export async function POST(req: Request) {
         trans_rule: "مهم: أجب باللغة العربية فقط. ترجم كل المحتوى.",
         btn_done: "أنا انتهيت (إرسال الآن)",
         btn_more: "لدي المزيد من الأسئلة",
+        btn_finish: "إنهاء الدليل",
+        btn_ask_more: "طرح سؤال آخر",
         sick_ack: "أوه لا، يرجى الراحة. هل يجب أن أخبر المدير أنك ستأخذ إجازة **اليوم**؟",
         sick_opts: "نعم من فضلك، لا - غداً",
         sick_finish: "حسناً. لقد أرسلت التقرير. أتمنى لك الشفاء العاجل. هل انتهيت؟",
@@ -96,11 +102,16 @@ ${P.trans_rule}
 
 ${dynamicContent}
 
-**CONTEXT-AWARE BUTTONS:**
-- **If Sick/Late:** Use \`||SUGGEST: ${P.btn_done}, ${P.btn_more}||\`
-- **If INSTRUCTION (Teaching):** DO NOT use 'Send now'.
-  - Use: **\`||SUGGEST: ${P.btn_step}, ${P.btn_summary}||\`**
-  - This signals the user that the lesson is over, not that they are reporting something.
+**CLOSURE TAG RULE (CONTEXT DEPENDENT):**
+
+**SCENARIO A: User is Reporting (Sick Leave / Late / IT Issue)**
+- When the details are confirmed and ready to send:
+- **MUST USE:** \`||SUGGEST: ${P.btn_done}, ${P.btn_more}||\`
+
+**SCENARIO B: User is Learning (Instruction Files / Guide)**
+- When the step-by-step guide is finished or user says done:
+- **MUST USE:** \`||SUGGEST: ${P.btn_finish}, ${P.btn_ask_more}||\`
+- *NEVER use 'Send now' for instructions.*
 
 **FORMATTING RULE:** Always wrap key details (Dates, Times, Locations, Action Items) in double asterisks like this: **Today**, **10 mins**, **Level 2**.
 
@@ -185,7 +196,7 @@ When asked about a cleaning task (Tools, Chemicals, Cloths, etc.):
    - **Respond in ${targetLangKey}.**
    - **If Step-by-step:** Translate the step to **${targetLangKey}**. Give Step 1 ONLY + Image Tag. Follow the **INSTRUCTION MODE OUTPUT TEMPLATE** exactly.
    - **If Summary:** Translate the full text to **${targetLangKey}**.
-     - **Tag:** \`||TYPE:SUMMARY|| ||SUGGEST: Finish Guide, Ask another question||\` (Translated)
+     - **Tag:** \`||TYPE:SUMMARY|| ||SUGGEST: ${P.btn_finish}, ${P.btn_ask_more}||\` (Translated)
 
 **System Prompt Closure Rule:**
 "CONTEXT AWARE CLOSURE:

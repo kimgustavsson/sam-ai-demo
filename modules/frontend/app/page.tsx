@@ -584,15 +584,13 @@ export default function MainChatScreen() {
     }
 
     // Validations for New Instruction Buttons
-    if (textToSend.includes("Finish Guide")) {
-      // Action 1: Add History Item (Silent)
-      addHistoryItem("INFO");
-
-      // Action 2: Show Success Screen
-      setSuccessType("guide"); 
-      setTicketState("success");
-      
-      setCurrentSuggestions([]);
+    const finishKeywords = ["Finish Guide", "Avsluta guiden", "إنهاء الدليل", "Finish"];
+    if (finishKeywords.some(k => textToSend.includes(k))) {
+      // Task: "Reset UI to the Instruction Menu", DO NOT create ticket
+      setViewState("instructions"); // Go back to menu
+      setMessages([]); // Clear chat
+      setCurrentSuggestions([]); // Clear buttons
+      setTicketState("chat"); // Ensure we are in chat mode
       return;
     }
 
