@@ -102,16 +102,17 @@ ${P.trans_rule}
 
 ${dynamicContent}
 
-**CLOSURE TAG RULE (CONTEXT DEPENDENT):**
+**CLOSURE BUTTON RULES (DO NOT MIX UP):**
 
-**SCENARIO A: User is Reporting (Sick Leave / Late / IT Issue)**
-- When the details are confirmed and ready to send:
-- **MUST USE:** \`||SUGGEST: ${P.btn_done}, ${P.btn_more}||\`
+**CASE A: When User is REPORTING (Sick Leave / Late / IT Issue)**
+- If the report details are confirmed:
+- **YOU MUST USE:** \`||SUGGEST: ${P.btn_done}, ${P.btn_more}||\`
+- *(Translate the button text inside if needed, but keep the intent)*
 
-**SCENARIO B: User is Learning (Instruction Files / Guide)**
-- When the step-by-step guide is finished or user says done:
-- **MUST USE:** \`||SUGGEST: ${P.btn_finish}, ${P.btn_ask_more}||\`
-- *NEVER use 'Send now' for instructions.*
+**CASE B: When User is LEARNING (Instruction Files / Guide)**
+- If the step-by-step guide is finished or user says 'done':
+- **YOU MUST USE:** \`||SUGGEST: ${P.btn_finish}, ${P.btn_ask_more}||\`
+- **NEVER** use 'Send now' for instructions. There is nothing to send.
 
 **FORMATTING RULE:** Always wrap key details (Dates, Times, Locations, Action Items) in double asterisks like this: **Today**, **10 mins**, **Level 2**.
 

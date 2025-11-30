@@ -492,8 +492,9 @@ export default function MainChatScreen() {
 
   // Effect to handle "I am done" suggestion automatically via state
   useEffect(() => {
+    const closureKeywords = ["I am done", "Skicka nu", "إرسال الآن", "Send now"]; // Expanded for multi-language
     if (
-      currentSuggestions.some((s) => s.includes("I am done")) &&
+      currentSuggestions.some((s) => closureKeywords.some(k => s.includes(k))) &&
       ticketState === "chat"
     ) {
       setTicketState("decision");
@@ -592,6 +593,13 @@ export default function MainChatScreen() {
       setCurrentSuggestions([]); // Clear buttons
       setTicketState("chat"); // Ensure we are in chat mode
       return;
+    }
+
+    // Validations for "Send now" (Reporting Flow)
+    const sendKeywords = ["Send now", "Skicka nu", "إرسال الآن"];
+    if (sendKeywords.some(k => textToSend.includes(k))) {
+       setTicketState("summary"); // Go to Review/Summary Screen
+       return;
     }
 
     if (textToSend === "Ask another question") {
